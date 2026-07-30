@@ -1,0 +1,58 @@
+{
+  "name": "@dock-tech/shared-copilot-front-lib",
+  "version": "2.2.0",
+  "description": "Configuração compartilhada de Copilot Instructions, Prompts, Agents e validação do Design System Dock",
+  "author": {
+    "name": "Brayhon Carvalho",
+    "email": "brayhon.carvalho@dock.tech"
+  },
+  "maintainers": [
+    {
+      "name": "Brayhon Carvalho",
+      "email": "brayhon.carvalho@dock.tech"
+    }
+  ],
+  "type": "module",
+  "publishConfig": {
+    "registry": "https://nexus.tools.dock.tech/repository/npm-internal/",
+    "access": "restricted"
+  },
+  "bin": {
+    "shared-copilot-front-lib": "./scripts/init.mjs"
+  },
+  "exports": {
+    "./eslint-plugin": "./eslint-plugin.js",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test:instructions": "node tests/instruction-tests.mjs",
+    "test:evals": "node tests/prompt-evals.mjs",
+    "figma:check": "node scripts/figma-check.mjs",
+    "figma:sync": "node scripts/figma-sync.mjs",
+    "validate:figma": "node scripts/figma-fidelity-audit.mjs",
+    "validate:contrast": "node scripts/validate-contrast.mjs",
+    "compliance": "node scripts/compliance-report.mjs",
+    "validate": "node scripts/validate-pipeline.mjs"
+  },
+  "files": [
+    "base/",
+    "scripts/",
+    "schemas/",
+    "templates/",
+    "evals/",
+    "eslint-plugin.js",
+    "eslint-plugin-dock-ds/",
+    "tests/",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "keywords": ["dock", "copilot", "design-system", "instructions", "eslint"],
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dock-tech/shared-copilot-front-lib"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

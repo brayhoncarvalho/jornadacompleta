@@ -61,14 +61,14 @@ const emit = defineEmits<{
   height: 44px;
   border: none;
   border-radius: 8px;
-  background: #f0f0f0;
+  background: var(--color-gray-100);
   color: var(--color-gray-600);
   cursor: pointer;
   transition: background 0.1s ease;
 }
 
 .flow-header__back-btn:hover {
-  background: #e0e0e0;
+  background: var(--color-gray-200);
   color: #242424;
 }
 

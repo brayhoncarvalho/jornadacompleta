@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-
-type AccessChannel = 'email' | 'celular'
+import { usePJBrand } from '../composables/usePJBrand'
+import type { AccessChannel } from '../types'
 
 const props = withDefaults(defineProps<{
   email?: string
   celular?: string
   canal?: AccessChannel
+  isPJ?: boolean
 }>(), {
   email: '',
   celular: '',
   canal: 'celular',
+  isPJ: false,
 })
 
 const emit = defineEmits<{
@@ -76,15 +78,17 @@ const handleResend = () => {
     ? 'Uma nova senha foi reenviada para o seu e-mail.'
     : 'Uma nova senha foi reenviada por SMS.'
 }
+
+const { logoSrc, logoAlt } = usePJBrand(() => props.isPJ)
 </script>
 
 <template>
-  <div class="senha-screen">
+  <div class="senha-screen" :class="{ 'is-pj': isPJ }">
 
     <!-- Header -->
     <header class="proposal-header">
       <div class="proposal-header__inner">
-        <img src="/assets/dock-logo-color.png" alt="Dock" class="proposal-header__logo" />
+        <img :src="logoSrc" :alt="logoAlt" class="proposal-header__logo" />
         <button type="button" class="proposal-header__back" @click="emit('voltar')" aria-label="Voltar">
           <span aria-hidden="true">←</span>
           Voltar
@@ -99,7 +103,7 @@ const handleResend = () => {
         <ol class="proposal-steps" aria-label="Progresso da proposta">
           <li class="proposal-steps__item is-active">
             <span class="proposal-steps__mark" aria-hidden="true">1</span>
-            <span class="proposal-steps__label">DADOS INICIAIS</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span>
           </li>
           <li class="proposal-steps__item">
             <span class="proposal-steps__mark" aria-hidden="true">2</span>
@@ -115,7 +119,7 @@ const handleResend = () => {
           </li>
           <li class="proposal-steps__item">
             <span class="proposal-steps__mark" aria-hidden="true">5</span>
-            <span class="proposal-steps__label">CONCLUSÃO</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span>
           </li>
         </ol>
 
@@ -190,6 +194,7 @@ const handleResend = () => {
   justify-content: space-between;
 }
 .proposal-header__logo { height: 24px; width: auto; }
+.is-pj .proposal-header__logo { height: 44px; }
 .proposal-header__back {
   display: inline-flex;
   align-items: center;

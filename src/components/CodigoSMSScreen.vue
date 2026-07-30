@@ -28,10 +28,12 @@ function onConfirmar() {
           <p class="csms-desc">Enviamos um SMS para seu celular. Você deve recebê-lo em alguns segundos. Insira o código abaixo e clique em <strong>Confirmar</strong>.</p>
           <div class="proposal-field">
             <label for="codigo-sms">Código SMS</label>
-            <input id="codigo-sms" v-model="codigo" type="text" inputmode="numeric" maxlength="10"
+            <input
+id="codigo-sms" v-model="codigo" type="text" inputmode="numeric" maxlength="10"
               placeholder="Digite o código recebido" autocomplete="one-time-code"
               class="proposal-input proposal-input--center"
-              @keydown.enter="onConfirmar" />
+              @keydown.enter="onConfirmar"
+/>
           </div>
           <button type="button" class="proposal-submit" :disabled="codigo.trim().length === 0" @click="onConfirmar">Confirmar</button>
           <button type="button" class="csms-btn-cancel" @click="emit('cancelar')">Cancelar</button>

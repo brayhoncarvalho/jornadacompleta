@@ -81,20 +81,16 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { VALORES_DISPONIVEIS_SIMULADOR, PRAZOS_DISPONIVEIS, PRAZO_PADRAO } from '../config/constants'
+import { formatCurrencyBRL, formatMonthlyRate, formatAnnualRateFromMonthly } from '../utils/formatters'
+import { calculatePricePMT } from '../lib/financeCalculations'
 
 const emit = defineEmits<{
   (e: 'solicitar', data: { valor: number; parcelas: number }): void
 }>()
 
 // Array de valores disponíveis — step não-uniforme: menor para valores baixos, maior para altos
-const valoresDisponiveis = [
-    250,   500,   750,
-  1_000, 1_500, 2_000, 2_500, 3_000, 3_500, 4_000, 4_500, 5_000,
-  6_000, 7_000, 8_000, 9_000, 10_000,
-  12_000, 14_000, 16_000, 18_000, 20_000,
-  25_000, 30_000, 35_000, 40_000, 45_000, 50_000,
-  55_000, 60_000, 65_000, 70_000, 75_000, 80_000, 85_000, 90_000, 95_000, 100_000,
-]
+const valoresDisponiveis = VALORES_DISPONIVEIS_SIMULADOR
 
 // Índice padrão → R$ 3.500
 const DEFAULT_INDEX = valoresDisponiveis.indexOf(3_500)
@@ -104,8 +100,8 @@ const valorEmprestimo = computed(() => valoresDisponiveis[sliderIndex.value])
 const valorAnterior   = computed(() => valoresDisponiveis[Math.max(0, sliderIndex.value - 1)])
 const valorProximo    = computed(() => valoresDisponiveis[Math.min(valoresDisponiveis.length - 1, sliderIndex.value + 1)])
 
-const parcelasSelecionada = ref(18)
-const parcelas = [6, 12, 16, 18, 24, 36]
+const parcelasSelecionada = ref(PRAZO_PADRAO)
+const parcelas = [...PRAZOS_DISPONIVEIS]
 
 // Taxas mensais reais — crédito pessoal não consignado (ref: BACEN 2026)
 const taxaPorPrazo: Record<number, number> = {
@@ -117,27 +113,17 @@ const taxaPorPrazo: Record<number, number> = {
   36: 0.0349,
 }
 
-// Tabela Price: PMT = PV × [i(1+i)^n] / [(1+i)^n - 1]
-const calcPmt = (pv: number, i: number, n: number): number =>
-  (pv * (i * Math.pow(1 + i, n))) / (Math.pow(1 + i, n) - 1)
-
 const taxaAtual = computed(() => taxaPorPrazo[parcelasSelecionada.value] ?? 0.0275)
 
 const parcelaMensal = computed(() =>
-  calcPmt(valorEmprestimo.value, taxaAtual.value, parcelasSelecionada.value)
+  calculatePricePMT(valorEmprestimo.value, taxaAtual.value, parcelasSelecionada.value)
 )
 
-const taxaMensalFormatada = computed(() =>
-  (taxaAtual.value * 100).toFixed(2).replace('.', ',') + '% a.m.'
-)
+const taxaMensalFormatada = computed(() => formatMonthlyRate(taxaAtual.value))
 
-const taxaAnualFormatada = computed(() => {
-  const anual = (Math.pow(1 + taxaAtual.value, 12) - 1) * 100
-  return anual.toFixed(2).replace('.', ',') + '% a.a.'
-})
+const taxaAnualFormatada = computed(() => formatAnnualRateFromMonthly(taxaAtual.value))
 
-const formatCurrency = (value: number): string =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const formatCurrency = (value: number): string => formatCurrencyBRL(value)
 
 const sliderPercent = computed(() =>
   Math.round((sliderIndex.value / (valoresDisponiveis.length - 1)) * 100)
@@ -154,7 +140,6 @@ const decrementar = () => {
 <style scoped>
 .simulador {
   width: 100%;
-  background: var(--color-gray-50);
 }
 
 .simulador__container {

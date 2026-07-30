@@ -155,9 +155,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-sexo">Sexo</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-sexo" v-model="sexo"
+                  <select
+id="dp-sexo" v-model="sexo"
                     :class="['proposal-select', touched.sexo && errors.sexo ? 'is-error' : '']"
-                    @blur="validateField('sexo')" @change="validateField('sexo')">
+                    @blur="validateField('sexo')" @change="validateField('sexo')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="feminino">Feminino</option>
                     <option value="masculino">Masculino</option>
@@ -172,9 +174,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-estado-civil">Estado Civil</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-estado-civil" v-model="estadoCivil"
+                  <select
+id="dp-estado-civil" v-model="estadoCivil"
                     :class="['proposal-select', touched.estadoCivil && errors.estadoCivil ? 'is-error' : '']"
-                    @blur="validateField('estadoCivil')" @change="validateField('estadoCivil')">
+                    @blur="validateField('estadoCivil')" @change="validateField('estadoCivil')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="solteiro">Solteiro(a)</option>
                     <option value="casado">Casado(a)</option>
@@ -191,9 +195,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-escolaridade">Escolaridade</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-escolaridade" v-model="escolaridade"
+                  <select
+id="dp-escolaridade" v-model="escolaridade"
                     :class="['proposal-select', touched.escolaridade && errors.escolaridade ? 'is-error' : '']"
-                    @blur="validateField('escolaridade')" @change="validateField('escolaridade')">
+                    @blur="validateField('escolaridade')" @change="validateField('escolaridade')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="fundamental-incompleto">Ensino Fundamental Incompleto</option>
                     <option value="fundamental-completo">Ensino Fundamental Completo</option>
@@ -214,9 +220,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-nacionalidade">Nacionalidade</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-nacionalidade" v-model="nacionalidade"
+                  <select
+id="dp-nacionalidade" v-model="nacionalidade"
                     :class="['proposal-select', touched.nacionalidade && errors.nacionalidade ? 'is-error' : '']"
-                    @blur="validateField('nacionalidade')" @change="validateField('nacionalidade')">
+                    @blur="validateField('nacionalidade')" @change="validateField('nacionalidade')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="brasileiro">Brasileiro(a)</option>
                     <option value="estrangeiro">Estrangeiro(a)</option>
@@ -230,9 +238,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-estado-nasc">Estado de nascimento</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-estado-nasc" v-model="estadoNascimento"
+                  <select
+id="dp-estado-nasc" v-model="estadoNascimento"
                     :class="['proposal-select', touched.estadoNascimento && errors.estadoNascimento ? 'is-error' : '']"
-                    @blur="validateField('estadoNascimento')" @change="validateField('estadoNascimento')">
+                    @blur="validateField('estadoNascimento')" @change="validateField('estadoNascimento')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option>
                     <option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option>
@@ -252,10 +262,12 @@ const handleProximo = () => {
               <!-- Cidade de Nascimento -->
               <div class="proposal-field">
                 <label for="dp-cidade-nasc">Cidade de nascimento</label>
-                <input id="dp-cidade-nasc" v-model="cidadeNascimento" type="text"
+                <input
+id="dp-cidade-nasc" v-model="cidadeNascimento" type="text"
                   :class="['proposal-input', touched.cidadeNascimento && errors.cidadeNascimento ? 'is-error' : '']"
                   placeholder="Digite a cidade"
-                  @blur="validateField('cidadeNascimento')" />
+                  @blur="validateField('cidadeNascimento')"
+/>
                 <p v-if="touched.cidadeNascimento && errors.cidadeNascimento" class="field-error" role="alert">{{ errors.cidadeNascimento }}</p>
               </div>
             </div>
@@ -267,10 +279,12 @@ const handleProximo = () => {
               <!-- Profissão -->
               <div class="proposal-field">
                 <label for="dp-profissao">Profissão</label>
-                <input id="dp-profissao" v-model="profissao" type="text"
+                <input
+id="dp-profissao" v-model="profissao" type="text"
                   :class="['proposal-input', touched.profissao && errors.profissao ? 'is-error' : '']"
                   placeholder="Digite sua profissão"
-                  @blur="validateField('profissao')" />
+                  @blur="validateField('profissao')"
+/>
                 <p v-if="touched.profissao && errors.profissao" class="field-error" role="alert">{{ errors.profissao }}</p>
               </div>
 
@@ -278,9 +292,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-ocupacao">Ocupação</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-ocupacao" v-model="ocupacao"
+                  <select
+id="dp-ocupacao" v-model="ocupacao"
                     :class="['proposal-select', touched.ocupacao && errors.ocupacao ? 'is-error' : '']"
-                    @blur="validateField('ocupacao')" @change="validateField('ocupacao')">
+                    @blur="validateField('ocupacao')" @change="validateField('ocupacao')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="assalariado">Assalariado</option>
                     <option value="autonomo">Autônomo</option>
@@ -299,9 +315,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-tempo-ocup">Tempo na ocupação atual</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-tempo-ocup" v-model="tempoOcupacao"
+                  <select
+id="dp-tempo-ocup" v-model="tempoOcupacao"
                     :class="['proposal-select', touched.tempoOcupacao && errors.tempoOcupacao ? 'is-error' : '']"
-                    @blur="validateField('tempoOcupacao')" @change="validateField('tempoOcupacao')">
+                    @blur="validateField('tempoOcupacao')" @change="validateField('tempoOcupacao')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="menos-1">Menos de 1 ano</option>
                     <option value="1-3">Entre 1 e 3 anos</option>
@@ -317,11 +335,13 @@ const handleProximo = () => {
               <!-- Patrimônio -->
               <div class="proposal-field">
                 <label for="dp-patrimonio">Patrimônio <sup>1</sup></label>
-                <input id="dp-patrimonio" :value="patrimonio" type="text" inputmode="numeric"
+                <input
+id="dp-patrimonio" :value="patrimonio" type="text" inputmode="numeric"
                   :class="['proposal-input', touched.patrimonio && errors.patrimonio ? 'is-error' : '']"
                   placeholder="R$ 0,00"
                   @input="onPatrimonioInput"
-                  @blur="validateField('patrimonio')" />
+                  @blur="validateField('patrimonio')"
+/>
                 <p v-if="touched.patrimonio && errors.patrimonio" class="field-error" role="alert">{{ errors.patrimonio }}</p>
               </div>
             </div>
@@ -346,9 +366,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-banco">Banco</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-banco" v-model="banco"
+                  <select
+id="dp-banco" v-model="banco"
                     :class="['proposal-select', touched.banco && errors.banco ? 'is-error' : '']"
-                    @blur="validateField('banco')" @change="validateField('banco')">
+                    @blur="validateField('banco')" @change="validateField('banco')"
+>
                     <option value="" disabled>Selecione o banco</option>
                     <option value="001">001 - Banco do Brasil</option>
                     <option value="033">033 - Santander</option>
@@ -379,9 +401,11 @@ const handleProximo = () => {
               <div class="proposal-field">
                 <label for="dp-tipo-conta">Tipo de Conta</label>
                 <div class="dp-select-wrap">
-                  <select id="dp-tipo-conta" v-model="tipoConta"
+                  <select
+id="dp-tipo-conta" v-model="tipoConta"
                     :class="['proposal-select', touched.tipoConta && errors.tipoConta ? 'is-error' : '']"
-                    @blur="validateField('tipoConta')" @change="validateField('tipoConta')">
+                    @blur="validateField('tipoConta')" @change="validateField('tipoConta')"
+>
                     <option value="" disabled>Selecione</option>
                     <option value="corrente">Conta-corrente</option>
                     <option value="poupanca">Poupança</option>
@@ -395,22 +419,26 @@ const handleProximo = () => {
               <!-- Agência -->
               <div class="proposal-field">
                 <label for="dp-agencia">Agência</label>
-                <input id="dp-agencia" :value="agencia" type="text" inputmode="numeric"
+                <input
+id="dp-agencia" :value="agencia" type="text" inputmode="numeric"
                   :class="['proposal-input', touched.agencia && errors.agencia ? 'is-error' : '']"
                   placeholder="0000 ou 0000-0"
                   @input="(e) => { const t = e.target as HTMLInputElement; agencia = maskAgencia(t.value); t.value = agencia }"
-                  @blur="validateField('agencia')" />
+                  @blur="validateField('agencia')"
+/>
                 <p v-if="touched.agencia && errors.agencia" class="field-error" role="alert">{{ errors.agencia }}</p>
               </div>
 
               <!-- Conta com Dígito -->
               <div class="proposal-field">
                 <label for="dp-conta">Conta com Dígito</label>
-                <input id="dp-conta" :value="conta" type="text" inputmode="numeric"
+                <input
+id="dp-conta" :value="conta" type="text" inputmode="numeric"
                   :class="['proposal-input', touched.conta && errors.conta ? 'is-error' : '']"
                   placeholder="00000000-0"
                   @input="(e) => { const t = e.target as HTMLInputElement; conta = maskConta(t.value); t.value = conta }"
-                  @blur="validateField('conta')" />
+                  @blur="validateField('conta')"
+/>
                 <p v-if="touched.conta && errors.conta" class="field-error" role="alert">{{ errors.conta }}</p>
               </div>
             </div>

@@ -146,7 +146,7 @@ describe('validateName', () => {
 
 describe('validateEmail', () => {
   it('aceita e-mail válido', () => {
-    expect(validateEmail('brayhon@gmail.com')).toBe('')
+    expect(validateEmail('transportadora@gmail.com')).toBe('')
   })
 
   it('rejeita e-mail inválido', () => {

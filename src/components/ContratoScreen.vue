@@ -15,6 +15,9 @@ const props = withDefaults(
     parcela?: string
     taxaNominalMensal?: string
     taxaNominalAnual?: string
+    isPJ?: boolean
+    razaoSocial?: string
+    cnpj?: string
   }>(),
   {
     valor: 'R$ 3.500,00',
@@ -22,6 +25,9 @@ const props = withDefaults(
     parcela: 'R$ 209,32',
     taxaNominalMensal: '2,75%',
     taxaNominalAnual: '38,40%',
+    isPJ: false,
+    razaoSocial: 'TRANS KOTHE TRANSPORTES RODOVIARIOS S/A',
+    cnpj: '03.052.564/0001-66',
   }
 )
 
@@ -51,28 +57,28 @@ const parcelas = computed(() =>
 </script>
 
 <template>
-  <div class="ct-screen">
-    <AuthHeader @voltar="emit('voltar')" @navigate="(a) => emit('navigate', a)" />
+  <div class="ct-screen" :class="{ 'is-pj': isPJ }">
+    <AuthHeader :is-p-j="isPJ" @voltar="emit('voltar')" @navigate="(a) => emit('navigate', a)" />
     <main class="proposal-main">
       <div class="proposal-main__inner">
         <ol class="proposal-steps" aria-label="Progresso da proposta">
-          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">DADOS INICIAIS</span></li>
+          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">PROPOSTA</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">CADASTRO</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">DOCUMENTOS</span></li>
-          <li class="proposal-steps__item is-active"><span class="proposal-steps__mark">5</span><span class="proposal-steps__label">CONCLUSÃO</span></li>
+          <li class="proposal-steps__item is-active"><span class="proposal-steps__mark">5</span><span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span></li>
         </ol>
 
-        <h1 class="ct-title">Contrato de Crédito Pessoal</h1>
+        <h1 class="ct-title">{{ props.isPJ ? 'Contrato de Adiantamento Empresarial' : 'Contrato de Crédito Pessoal' }}</h1>
         <p class="ct-subtitle">Leia atentamente antes de assinar.</p>
 
         <div class="ct-viewer">
-          <div class="ct-doc-scroll" tabindex="0" aria-label="Contrato de Crédito Pessoal" role="document">
+          <div class="ct-doc-scroll" tabindex="0" :aria-label="props.isPJ ? 'Contrato de Adiantamento Empresarial' : 'Contrato de Crédito Pessoal'" role="document">
             <div class="ct-doc">
-              <h2 class="ct-doc__title">CONTRATO DE CRÉDITO PESSOAL</h2>
+              <h2 class="ct-doc__title">{{ props.isPJ ? 'CONTRATO DE ADIANTAMENTO EMPRESARIAL' : 'CONTRATO DE CRÉDITO PESSOAL' }}</h2>
               <p class="ct-doc__section-title">PARTES CONTRATANTES</p>
-              <p class="ct-doc__text">CONTRATANTE: Brayhon Oliveira Carvalho, CPF 412.456.508-90, residente em Palmas – TO.</p>
-              <p class="ct-doc__text">CONTRATADA: Dock Tech, CNPJ 14.379.835/0002-23, com sede em São Paulo – SP.</p>
+              <p class="ct-doc__text">CONTRATANTE: {{ props.isPJ ? `${props.razaoSocial}, CNPJ ${props.cnpj}` : 'TRANS KOTHE TRANSPORTES RODOVIARIOS S/A, CNPJ 03.052.564/0001-66, com sede em Jundiaí - SP' }}.</p>
+              <p class="ct-doc__text">CONTRATADA: REDE FROTA SOLUTIONS LTDA, CNPJ 24.478.438/0001-48, com sede em São Paulo – SP.</p>
 
               <p class="ct-doc__section-title">CONDIÇÕES FINANCEIRAS</p>
               <table class="ct-doc__table" aria-label="Resumo das condições financeiras">
@@ -109,8 +115,8 @@ const parcelas = computed(() =>
 
               <p class="ct-doc__section-title">ASSINATURAS</p>
               <div class="ct-doc__sigs">
-                <div class="ct-doc__sig"><div class="ct-doc__sig-line"></div><p>Contratante: Brayhon Oliveira Carvalho</p></div>
-                <div class="ct-doc__sig"><div class="ct-doc__sig-line"></div><p>Contratada: Dock Inst. de Pagamentos</p></div>
+                <div class="ct-doc__sig"><div class="ct-doc__sig-line"></div><p>Contratante: {{ props.isPJ ? props.razaoSocial : 'Brayhon Oliveira Carvalho' }}</p></div>
+                <div class="ct-doc__sig"><div class="ct-doc__sig-line"></div><p>Contratada: REDE FROTA SOLUTIONS LTDA</p></div>
               </div>
             </div>
           </div>
@@ -147,6 +153,7 @@ const parcelas = computed(() =>
 .ct-viewer { background: #ffffff; border: 1px solid var(--color-primary-100); border-radius: 20px; box-shadow: 0 8px 32px rgba(10, 22, 40, 0.06); overflow: hidden; margin-bottom: 24px; }
 .ct-doc-scroll { max-height: 480px; overflow-y: auto; padding: 24px 24px 16px; }
 .ct-doc-scroll:focus { outline: 2px solid #00d8d8; outline-offset: -2px; }
+.is-pj .ct-doc-scroll:focus { outline-color: #8f0000; }
 .ct-doc__title { font-family: "Bricolage Grotesque", sans-serif; font-size: 22px; font-weight: 700; color: var(--color-navy-800); text-align: center; margin: 0 0 20px; }
 .ct-doc__section-title { font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 700; color: var(--color-primary-500); text-transform: uppercase; letter-spacing: 0.07em; margin: 20px 0 8px; }
 .ct-doc__text { font-family: "Instrument Sans", sans-serif; font-size: 16px; color: var(--color-navy-700); line-height: 1.6; margin: 0 0 8px; }

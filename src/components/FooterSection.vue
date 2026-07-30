@@ -4,11 +4,10 @@
       <div class="landing-footer__body-inner">
         <div class="landing-footer__row">
           <div>
-            <img src="/assets/dock-logo-color.png" alt="Dock" class="landing-footer__logo" />
-                  <br>
+            <img :src="isPJ ? `${base}assets/Rede-Frota.svg` : `${base}assets/dock-logo-color.png`" :alt="isPJ ? 'Rede Frota' : 'Dock'" class="landing-footer__logo" :class="{ 'landing-footer__logo--pj': isPJ }" />
+                  <br/>
                   <p class="landing-footer__copyright">
-                    © 2026 DOCK TECH —
-                    Av. Tamboré, 267, Alphaville, Barueri - SP — CEP 06460-000
+                    {{ isPJ ? '© 2026 Rede Frota — Av. Tamboré, 267, Alphaville, Barueri - SP — CEP 06460-000' : '© 2026 Rede Frota — Av. Tamboré, 267, Alphaville, Barueri - SP — CEP 06460-000' }}
                   </p>
           </div>
 
@@ -33,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+withDefaults(defineProps<{ isPJ?: boolean }>(), { isPJ: false })
+const base = import.meta.env.BASE_URL
 </script>
 
 <style scoped>
@@ -58,6 +59,10 @@
   width: auto;
   display: block;
   margin-bottom: 16px;
+}
+
+.landing-footer__logo--pj {
+  height: 44px;
 }
 
 .landing-footer__meta {

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { usePJBrand } from '../composables/usePJBrand'
 
 const props = withDefaults(defineProps<{
   showBack?: boolean
   backLabel?: string
+  isPJ?: boolean
 }>(), {
   showBack: true,
   backLabel: 'Voltar',
+  isPJ: false,
 })
 
 const emit = defineEmits<{
@@ -26,6 +29,8 @@ function handleGlobalClick(e: MouseEvent) {
 onMounted(() => document.addEventListener('mousedown', handleGlobalClick))
 onUnmounted(() => document.removeEventListener('mousedown', handleGlobalClick))
 
+const { logoSrc, logoAlt } = usePJBrand(() => props.isPJ)
+
 function handleAction(action: 'sair' | 'emprestimos' | 'meus-dados') {
   dropdownOpen.value = false
   emit('navigate', action)
@@ -33,9 +38,9 @@ function handleAction(action: 'sair' | 'emprestimos' | 'meus-dados') {
 </script>
 
 <template>
-  <header class="auth-header">
+  <header class="auth-header" :class="{ 'auth-header--pj': props.isPJ }">
     <div class="auth-header__inner">
-      <img src="/assets/dock-logo-color.png" alt="Dock" class="auth-header__logo" />
+      <img :src="logoSrc" :alt="logoAlt" class="auth-header__logo" />
       <div class="auth-header__right">
         <button
           v-if="props.showBack"
@@ -104,6 +109,7 @@ function handleAction(action: 'sair' | 'emprestimos' | 'meus-dados') {
 .auth-header { position: sticky; top: 0; z-index: 20; background: var(--color-gray-50); border-bottom: 1px solid var(--color-primary-100); }
 .auth-header__inner { max-width: 1024px; margin: 0 auto; padding: 0 20px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
 .auth-header__logo { height: 24px; width: auto; }
+.auth-header--pj .auth-header__logo { height: 44px; }
 .auth-header__right { display: flex; align-items: center; gap: 12px; }
 .auth-header__back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--color-primary-100); border-radius: 999px; background: transparent; color: var(--color-navy-800); font-family: "Instrument Sans", sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
 .auth-header__back:hover { background: var(--color-primary-50); }
@@ -119,10 +125,10 @@ function handleAction(action: 'sair' | 'emprestimos' | 'meus-dados') {
 .auth-dd__item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: none; background: transparent; border-radius: 10px; font-family: "Instrument Sans", sans-serif; font-size: 16px; font-weight: 500; color: var(--color-navy-800); cursor: pointer; text-align: left; transition: background 0.12s; }
 .auth-dd__item:hover:not([disabled]) { background: var(--color-primary-50); }
 .auth-dd__item--soon { color: var(--color-navy-800); }
-.auth-dd__item--exit { color: #c0392b; }
-.auth-dd__item--exit:hover { background: #fff5f5; }
+.auth-dd__item--exit { color: var(--color-danger-600); }
+.auth-dd__item--exit:hover { background: var(--color-danger-50); }
 .auth-dd__badge { margin-left: auto; font-size: 15px; font-weight: 600; color: var(--color-navy-400); background: var(--color-primary-50); border-radius: 999px; padding: 2px 8px; }
 .auth-dd__divider { border: none; border-top: 1px solid var(--color-primary-100); margin: 4px 0; }
 @media (max-width: 480px) { .auth-dd__name { display: none; } }
-@media (min-width: 640px) { .auth-header__inner { height: 72px; } .auth-header__logo { height: 26px; } }
+@media (min-width: 640px) { .auth-header__inner { height: 72px; } .auth-header__logo { height: 26px; } .auth-header--pj .auth-header__logo { height: 44px; } }
 </style>

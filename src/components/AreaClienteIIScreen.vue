@@ -73,7 +73,7 @@ const emprestimos: Emprestimo[] = [
 .ac-actions { padding-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
 .ac-btn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px; border: none; border-radius: 999px; cursor: pointer; font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; transition: background 0.15s; }
 .ac-btn--dark { background: #444746; }
-.ac-btn--dark:hover { background: #333534; }
+.ac-btn--dark:hover { background: var(--color-navy-600); }
 .ac-btn__circle { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 50%; flex-shrink: 0; }
 .proposal-submit--inline { height: 42px; border: none; border-radius: 999px; background: var(--btn-primary-bg); color: var(--btn-primary-color); font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; padding: 0 20px; transition: background 0.15s; }
 .proposal-submit--inline:hover { background: var(--btn-primary-bg-hover); color: #ffffff; }

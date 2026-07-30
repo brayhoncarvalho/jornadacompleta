@@ -79,7 +79,7 @@ const emprestimo = {
 .ac-actions { padding-top: 16px; }
 .ac-btn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px; border: none; border-radius: 999px; cursor: pointer; font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; transition: background 0.15s; }
 .ac-btn--dark { background: #444746; }
-.ac-btn--dark:hover { background: #333534; }
+.ac-btn--dark:hover { background: var(--color-navy-600); }
 .ac-btn__circle { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 50%; flex-shrink: 0; }
 .proposal-submit { width: 100%; height: 52px; border: none; border-radius: 999px; background: var(--btn-primary-bg); color: var(--btn-primary-color); font-family: "Bricolage Grotesque", sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
 .proposal-submit:hover { background: var(--btn-primary-bg-hover); color: #ffffff; }

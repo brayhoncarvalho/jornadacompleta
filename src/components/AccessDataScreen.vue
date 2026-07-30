@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { reactive, ref, nextTick } from 'vue'
+import { usePJBrand } from '../composables/usePJBrand'
 import { maskPhone } from '../utils/masks'
 import { validateEmail, validatePhone } from '../utils/validators'
+import type { OptionalAccessChannel } from '../types'
 
-type AccessChannel = '' | 'email' | 'celular'
+const props = withDefaults(
+  defineProps<{ isPJ?: boolean }>(),
+  { isPJ: false }
+)
 
 const emit = defineEmits<{
   (e: 'voltar'): void
   (e: 'enviar', payload: { email: string; celular: string; canal: 'email' | 'celular' }): void
 }>()
 
+const { logoSrc, logoAlt } = usePJBrand(() => props.isPJ)
+
 const IS_DEV_PREFILL = true
 
-const email = ref(IS_DEV_PREFILL ? 'brayhon@gmail.com' : '')
+const email = ref(IS_DEV_PREFILL ? 'transportadora@gmail.com' : '')
 const celular = ref(IS_DEV_PREFILL ? maskPhone('11954489531') : '')
-const canal = ref<AccessChannel>(IS_DEV_PREFILL ? 'celular' : '')
+const canal = ref<OptionalAccessChannel>(IS_DEV_PREFILL ? 'celular' : '')
 
 const errors = reactive({
   email: '',
@@ -87,12 +94,12 @@ const handleEnviar = () => {
 </script>
 
 <template>
-  <div class="ad-screen">
+  <div class="ad-screen" :class="{ 'is-pj': isPJ }">
 
     <!-- Header -->
     <header class="proposal-header">
       <div class="proposal-header__inner">
-        <img src="/assets/dock-logo-color.png" alt="Dock" class="proposal-header__logo" />
+        <img :src="logoSrc" :alt="logoAlt" class="proposal-header__logo" />
         <button type="button" class="proposal-header__back" @click="emit('voltar')" aria-label="Voltar">
           <span aria-hidden="true">←</span>
           Voltar
@@ -107,7 +114,7 @@ const handleEnviar = () => {
         <ol class="proposal-steps" aria-label="Progresso da proposta">
           <li class="proposal-steps__item is-active">
             <span class="proposal-steps__mark" aria-hidden="true">1</span>
-            <span class="proposal-steps__label">DADOS INICIAIS</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span>
           </li>
           <li class="proposal-steps__item">
             <span class="proposal-steps__mark" aria-hidden="true">2</span>
@@ -123,7 +130,7 @@ const handleEnviar = () => {
           </li>
           <li class="proposal-steps__item">
             <span class="proposal-steps__mark" aria-hidden="true">5</span>
-            <span class="proposal-steps__label">CONCLUSÃO</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span>
           </li>
         </ol>
 
@@ -233,6 +240,7 @@ const handleEnviar = () => {
 }
 
 .proposal-header__logo { height: 24px; width: auto; }
+.is-pj .proposal-header__logo { height: 44px; }
 
 .proposal-header__back {
   display: inline-flex;

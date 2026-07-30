@@ -117,7 +117,7 @@ function handleSubmit() {
     </header>
     <main class="proposal-main">
       <div class="proposal-main__inner">
-        <h1 class="cad-title">Solicite uma proposta<br>sem compromisso</h1>
+        <h1 class="cad-title">Solicite uma proposta<br/>sem compromisso</h1>
         <form class="proposal-form" @submit.prevent="handleSubmit" novalidate>
           <!-- CPF -->
           <div class="proposal-field">
@@ -151,7 +151,7 @@ function handleSubmit() {
                 <option value="" disabled>Selecione o motivo</option>
                 <option v-for="opt in motivoOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
               </select>
-              <span class="cad-chevron" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b5080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <span class="cad-chevron" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3c4043" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
             </div>
             <p v-if="motivoError" id="cad-motivo-err" class="proposal-field-error" role="alert" data-error-testid>{{ motivoError }}</p>
           </div>

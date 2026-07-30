@@ -15,6 +15,7 @@ const props = withDefaults(
     parcela?: string
     taxaNominal?: string
     taxaEfetiva?: string
+    isPJ?: boolean
   }>(),
   {
     valor: 'R$ 3.500,00',
@@ -22,6 +23,7 @@ const props = withDefaults(
     parcela: 'R$ 209,32',
     taxaNominal: '2,75% a.m./ 38,40% a.a.',
     taxaEfetiva: '2,85% a.m./ 40,08% a.a.',
+    isPJ: false,
   }
 )
 
@@ -43,16 +45,16 @@ const campos = computed(() => [
 </script>
 
 <template>
-  <div class="rv-screen">
-    <AuthHeader @voltar="emit('voltar')" @navigate="(a) => emit('navigate', a)" />
+  <div class="rv-screen" :class="{ 'is-pj': isPJ }">
+    <AuthHeader :is-p-j="isPJ" @voltar="emit('voltar')" @navigate="(a) => emit('navigate', a)" />
     <main class="proposal-main">
       <div class="proposal-main__inner">
         <ol class="proposal-steps" aria-label="Progresso da proposta">
-          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">DADOS INICIAIS</span></li>
+          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">PROPOSTA</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">CADASTRO</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark">&#x2713;</span><span class="proposal-steps__label">DOCUMENTOS</span></li>
-          <li class="proposal-steps__item is-active"><span class="proposal-steps__mark">5</span><span class="proposal-steps__label">CONCLUSÃO</span></li>
+          <li class="proposal-steps__item is-active"><span class="proposal-steps__mark">5</span><span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span></li>
         </ol>
         <h1 class="rv-title">Revisão de Contrato</h1>
         <p class="rv-subtitle">Revise os dados da sua proposta antes de gerar o contrato.</p>

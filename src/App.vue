@@ -53,51 +53,59 @@ import ConclusaoScreen from './components/ConclusaoScreen.vue'
 import MeusDadosScreen from './components/MeusDadosScreen.vue'
 import GmailSimuladorScreen from './components/GmailSimuladorScreen.vue'
 import CapturaSelfieScreen from './components/CapturaSelfieScreen.vue'
+import PjDashboardScreen from './components/pj/PjDashboardScreen.vue'
+import PjCartoesScreen from './components/pj/PjCartoesScreen.vue'
+import PjAporteScreen from './components/pj/PjAporteScreen.vue'
+import PjMotoristaScreen from './components/pj/PjMotoristaScreen.vue'
+import PjPropostaContratacaoScreen from './components/pj/PjPropostaContratacaoScreen.vue'
+import PjPropostaOfertaScreen from './components/pj/PjPropostaOfertaScreen.vue'
+import PjDadosEmpresaScreen from './components/pj/PjDadosEmpresaScreen.vue'
+import PjRepresentanteScreen from './components/pj/PjRepresentanteScreen.vue'
+import PjContratoAssinadoScreen from './components/pj/PjContratoAssinadoScreen.vue'
+import type { Screen, PjView, AccessChannel, AccessPayload, SimulacaoState, OfertaState, PjPropostaDados, PjOfertaData } from './types'
+import { FALLBACK_SCREEN, VALID_SCREENS, TAXA_MENSAL_PADRAO, TAXA_CET_DELTA, PJ_ONBOARDING_SCREENS } from './config/constants'
+import { formatCurrencyBRL, formatMonthlyRate, formatAnnualRateFromMonthly } from './utils/formatters'
+import { calculatePricePMT, withCetDelta } from './lib/financeCalculations'
 
-type Screen = 'landing' | 'proposta' | 'dados-acesso' | 'senha' | 'proposta-personalizada' | 'dados-pessoais' | 'endereco-telefone' | 'captura-selfie' | 'envio-documentos' | 'documentos-status' | 'concluir' | 'area-cliente' | 'area-cliente-2' | 'email-simulacao' | 'revisao' | 'autenticacao-sms' | 'codigo-sms' | 'contrato' | 'conclusao' | 'cadastro' | 'meus-dados'
-type AccessChannel = 'email' | 'celular'
-
-type AccessPayload = {
-  email: string
-  celular: string
-  canal: AccessChannel
-}
-
-interface SimulacaoState {
-  valor: number
-  parcelas: number
-}
-
-interface OfertaState {
-  installments: number
-  amount: number
-  rate: number
-}
-
-const fallbackScreen: Screen = 'landing'
-const validScreens = new Set<Screen>(['landing', 'proposta', 'dados-acesso', 'senha', 'proposta-personalizada', 'dados-pessoais', 'endereco-telefone', 'captura-selfie', 'envio-documentos', 'documentos-status', 'concluir', 'area-cliente', 'area-cliente-2', 'email-simulacao', 'revisao', 'autenticacao-sms', 'codigo-sms', 'contrato', 'conclusao', 'cadastro', 'meus-dados'])
+const fallbackScreen: Screen = FALLBACK_SCREEN
+const validScreens = new Set<Screen>(VALID_SCREENS as Screen[])
 const accessPayload = ref<AccessPayload | null>(null)
 
-// Estado da simulação — alimentado pelo SimuladorSection e propagado para as próximas telas
-const simulacao = ref<SimulacaoState>({ valor: 3500, parcelas: 18 })
-const oferta = ref<OfertaState>({ installments: 18, amount: 209, rate: 0.0275 })
+// ── Estado do fluxo de onboarding PJ ────────────────────────────────────────
 
-const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const pjProposta = ref<PjPropostaDados | null>(null)
+const pjOfertaData = ref<PjOfertaData | null>(null)
+
+const pjValorTotal = computed(() => pjOfertaData.value?.valorTotal ?? 100000)
+const pjTaxaMes = computed(() => pjOfertaData.value?.taxaMes ?? TAXA_MENSAL_PADRAO)
+const pjPrazoMeses = computed(() => pjOfertaData.value?.prazo ?? 12)
+
+const fmtBRL = (v: number) => formatCurrencyBRL(v)
+
+const pjValorStr = computed(() => fmtBRL(pjValorTotal.value))
+const pjPrazoStr = computed(() => `${pjPrazoMeses.value} meses`)
+const pjParcelaVal = computed(() => calculatePricePMT(pjValorTotal.value, pjTaxaMes.value, pjPrazoMeses.value))
+const pjParcelaStr = computed(() => fmtBRL(pjParcelaVal.value))
+const pjTaxaNomStr = computed(() => `${formatMonthlyRate(pjTaxaMes.value)}/ ${formatAnnualRateFromMonthly(pjTaxaMes.value)}`)
+const pjTaxaEfStr = computed(() => {
+  const rCet = withCetDelta(pjTaxaMes.value, TAXA_CET_DELTA)
+  return `${formatMonthlyRate(rCet)}/ ${formatAnnualRateFromMonthly(rCet)}`
+})
+const pjTaxaMensalStr = computed(() => formatMonthlyRate(pjTaxaMes.value))
+const pjTaxaAnualStr = computed(() => formatAnnualRateFromMonthly(pjTaxaMes.value))
+
+// Estado da simulação — alimentado pelo SimuladorSection e propagado para as próximas telas
+const simulacao = ref<SimulacaoState>({ valor: 100000, parcelas: 18 })
+const oferta = ref<OfertaState>({ installments: 18, amount: 209, rate: TAXA_MENSAL_PADRAO })
 
 const propostaValor    = computed(() => fmtBRL(simulacao.value.valor))
 const propostaParcela  = computed(() => fmtBRL(oferta.value.amount))
 const propostaPrazo    = computed(() => `${oferta.value.installments} meses`)
 const propostaCondicoes = computed(() => `${oferta.value.installments}x de ${fmtBRL(oferta.value.amount)}`)
-const propostaTaxaNominal = computed(() => {
-  const m = (oferta.value.rate * 100).toFixed(2).replace('.', ',')
-  const a = ((Math.pow(1 + oferta.value.rate, 12) - 1) * 100).toFixed(2).replace('.', ',')
-  return `${m}% a.m./ ${a}% a.a.`
-})
+const propostaTaxaNominal = computed(() => `${formatMonthlyRate(oferta.value.rate)}/ ${formatAnnualRateFromMonthly(oferta.value.rate)}`)
 const propostaTaxaEfetiva = computed(() => {
-  const rCet = oferta.value.rate + 0.001
-  const m = (rCet * 100).toFixed(2).replace('.', ',')
-  const a = ((Math.pow(1 + rCet, 12) - 1) * 100).toFixed(2).replace('.', ',')
-  return `${m}% a.m./ ${a}% a.a.`
+  const rCet = withCetDelta(oferta.value.rate, TAXA_CET_DELTA)
+  return `${formatMonthlyRate(rCet)}/ ${formatAnnualRateFromMonthly(rCet)}`
 })
 
 const getScreenFromQuery = (): Screen => {
@@ -118,6 +126,26 @@ const updateScreenQuery = (screen: Screen) => {
 }
 
 const currentScreen = ref<Screen>(getScreenFromQuery())
+
+const PJ_ONBOARDING_SCREENS: Screen[] = [
+  'pj-proposta-contratacao', 'pj-proposta-oferta', 'pj-dados-empresa', 'pj-representante',
+  'pj-contrato-assinado', 'dados-acesso', 'senha', 'endereco-telefone',
+  'envio-documentos', 'revisao', 'contrato',
+]
+
+// Modo PJ: ativado via ?isPJ=true na URL, por qualquer tela pj-*, ou pelo fluxo de onboarding PJ
+const isPjMode = ref(
+  new URLSearchParams(window.location.search).get('isPJ') === 'true' ||
+  (getScreenFromQuery() as string).startsWith('pj-')
+)
+watch(currentScreen, (screen) => {
+  if ((screen as string).startsWith('pj-') || PJ_ONBOARDING_SCREENS.includes(screen)) {
+    isPjMode.value = true
+  }
+})
+const isPjOnboarding = computed(() => isPjMode.value || PJ_ONBOARDING_SCREENS.includes(currentScreen.value))
+
+const baseUrl = import.meta.env.BASE_URL
 
 const screenTitles: Record<Screen, string> = {
   'landing': 'Dock — Empréstimo Online',
@@ -141,7 +169,20 @@ const screenTitles: Record<Screen, string> = {
   'conclusao': 'Parabéns! — Dock',
   'meus-dados': 'Meus Dados — Dock',
   'cadastro': 'Solicitar Proposta — Dock',
+  'pj-dashboard': 'Dashboard de Adiantamento — RedeFrota',
+  'pj-cartoes': 'Cartões de Despesas — RedeFrota',
+  'pj-aporte': 'Realizar Aporte — RedeFrota',
+  'pj-motorista': 'App Motorista — RedeFrota',
+  'pj-proposta-contratacao': 'Solicitar Adiantamento — FrotaBank',
+  'pj-proposta-oferta': 'Simule seu Adiantamento — FrotaBank',
+  'pj-dados-empresa': 'Dados da Empresa — FrotaBank',
+  'pj-representante': 'Representante Legal — FrotaBank',
+  'pj-contrato-assinado': 'Contrato Assinado! — FrotaBank',
 }
+
+watchEffect(() => {
+  document.title = screenTitles[currentScreen.value]
+})
 
 const setScreen = (screen: Screen) => {
   currentScreen.value = screen
@@ -159,7 +200,7 @@ const setScreen = (screen: Screen) => {
 
 const goToProposta = (data?: { valor: number; parcelas: number }) => {
   if (data) simulacao.value = data
-  setScreen('proposta')
+  setScreen('pj-proposta-contratacao')
 }
 
 const goToLanding = () => {
@@ -176,7 +217,7 @@ const goToSenha = (payload: AccessPayload) => {
 }
 
 const goToPropostaPersonalizada = () => {
-  setScreen('proposta-personalizada')
+  setScreen('pj-dados-empresa')
 }
 
 const goToDadosPessoais = (offer?: OfertaState & { valor?: number }) => {
@@ -198,11 +239,6 @@ const goToCapturaSelfie = () => {
 
 const goToEnvioDocumentos = () => {
   setScreen('envio-documentos')
-}
-
-const goToEnvioDocumentosUpload = () => {
-  setScreen('envio-documentos')
-  envioDocStep.value = 'upload'
 }
 
 const envioDocStep = ref<'tipo' | 'upload'>('tipo')
@@ -251,26 +287,68 @@ const goToConclusao = () => {
   setScreen('conclusao')
 }
 
+const goToPjScreen = (view: PjView) => {
+  if (view === 'dashboard') setScreen('pj-dashboard')
+  else if (view === 'cartoes') setScreen('pj-cartoes')
+  else if (view === 'aporte') setScreen('pj-aporte')
+  else if (view === 'motorista') setScreen('pj-motorista')
+  else setScreen('landing')
+}
+
+// ── Handlers do fluxo de onboarding PJ ───────────────────────────────
+const goToPjPropostaContratacao = () => setScreen('pj-proposta-contratacao')
+
+const handleSolicitar = (data: { valor: number; parcelas: number }) => {
+  simulacao.value = { valor: data.valor, parcelas: data.parcelas }
+  goToProposta()
+}
+const goToPjPropostaOferta = () => setScreen('pj-proposta-oferta')
+const goToPjDadosEmpresa = () => setScreen('pj-dados-empresa')
+const goToPjRepresentante = () => setScreen('pj-representante')
+
+const handlePjPropostaContinuar = (dados: PjPropostaDados) => {
+  pjProposta.value = dados
+  setScreen('pj-proposta-oferta')
+}
+
+const handlePjOfertaContinuar = (ofertaIn: PjOfertaData) => {
+  pjOfertaData.value = ofertaIn
+  setScreen('dados-acesso')
+}
+
 const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   if (action === 'sair') goToLanding()
-  else if (action === 'emprestimos') goToAreaCliente()
+  else if (action === 'emprestimos') setScreen('pj-dashboard')
   else if (action === 'meus-dados') setScreen('meus-dados')
 }
 </script>
 
 <template>
-  <div class="min-h-screen w-full bg-white">
+  <div class="min-h-screen w-full bg-white" :class="{ 'theme-pj': isPjOnboarding }">
     <a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
-    <template v-if="currentScreen === 'landing'">
+    <template v-if="currentScreen === 'pj-dashboard'">
+      <PjDashboardScreen @navigate="goToPjScreen" />
+    </template>
+    <template v-else-if="currentScreen === 'pj-cartoes'">
+      <PjCartoesScreen @navigate="goToPjScreen" />
+    </template>
+    <template v-else-if="currentScreen === 'pj-aporte'">
+      <PjAporteScreen @navigate="goToPjScreen" />
+    </template>
+    <template v-else-if="currentScreen === 'pj-motorista'">
+      <PjMotoristaScreen @navigate="goToPjScreen" />
+    </template>
+    <template v-else-if="currentScreen === 'landing'">
       <header class="landing-nav">
         <div class="landing-nav__inner">
-          <img src="/assets/dock-logo-color.png" alt="Dock" class="landing-nav__logo" />
+          <img :src="isPjMode ? `${baseUrl}assets/Rede-Frota.svg` : `${baseUrl}assets/dock-logo-color.png`" :alt="isPjMode ? 'Rede Frota' : 'Dock'" class="landing-nav__logo" />
           <nav class="landing-nav__links" aria-label="Navegação principal">
             <a href="#simulador">Empréstimo</a>
             <a href="#como-funciona">Como funciona</a>
             <a href="#beneficios">Segurança</a>
             <a href="#footer">Ajuda</a>
           </nav>
+          <button class="landing-nav__pj" type="button" @click="setScreen('pj-dashboard')">Portal PJ</button>
           <button class="landing-nav__cta" type="button" @click="goToProposta">Simular grátis</button>
           <button ref="menuTriggerRef" class="landing-nav__btn" :aria-label="menuOpen ? 'Fechar menu' : 'Abrir menu'" :aria-expanded="menuOpen" :aria-controls="menuOpen ? 'mobile-menu' : undefined" @click="menuOpen = !menuOpen">
             <span :class="{ 'is-open-top': menuOpen }"></span>
@@ -286,13 +364,26 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
             <a href="#beneficios" @click="closeMenu">Segurança</a>
             <a href="#footer" @click="closeMenu">Ajuda</a>
           </nav>
+          <button class="landing-nav__drawer-pj" type="button" @click="closeMenu(); setScreen('pj-dashboard')">Portal PJ</button>
           <button class="landing-nav__drawer-cta" type="button" @click="closeMenu(); goToProposta()">Simular grátis</button>
         </div>
       </header>
 
-      <div id="main-content" class="landing-above-fold">
-        <HeroSection @simular="goToProposta" />
-        <SimuladorSection @solicitar="goToProposta" />
+      <div class="landing-above-fold-wrap">
+        <video
+          class="landing-above-fold__video-bg"
+          autoplay
+          muted
+          loop
+          playsinline
+          aria-hidden="true"
+        >
+          <source src="/assets/hero-bg.mp4" type="video/mp4" />
+        </video>
+        <div id="main-content" class="landing-above-fold">
+          <HeroSection @simular="goToProposta" />
+          <SimuladorSection @solicitar="handleSolicitar" />
+        </div>
       </div>
 
       <section class="landing-trust" aria-label="Diferenciais de confiança">
@@ -306,16 +397,45 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
 
       <ComoFuncionaSection @contrate="goToProposta" />
       <BeneficiosSection />
-      <FooterSection />
+      <FooterSection :is-p-j="isPjMode" />
     </template>
     <template v-else-if="currentScreen === 'proposta'">
       <PropostaScreen :valorInicial="simulacao.valor" @voltar="goToLanding" @continuar="goToDadosAcesso" />
     </template>
+    <template v-else-if="currentScreen === 'pj-proposta-contratacao'">
+      <PjPropostaContratacaoScreen
+        :valor-inicial="simulacao.valor"
+        :prazo-inicial="simulacao.parcelas"
+        @voltar="goToLanding"
+        @continuar="handlePjPropostaContinuar"
+      />
+    </template>
+    <template v-else-if="currentScreen === 'pj-proposta-oferta'">
+      <PjPropostaOfertaScreen
+        :dados="pjProposta ?? undefined"
+        :prazo-inicial="simulacao.parcelas"
+        @voltar="goToPjPropostaContratacao"
+        @continuar="handlePjOfertaContinuar"
+      />
+    </template>
+    <template v-else-if="currentScreen === 'pj-dados-empresa'">
+      <PjDadosEmpresaScreen
+        @voltar="goToDadosAcesso"
+        @continuar="goToPjRepresentante"
+      />
+    </template>
+    <template v-else-if="currentScreen === 'pj-representante'">
+      <PjRepresentanteScreen
+        @voltar="goToPjDadosEmpresa"
+        @continuar="goToEnderecoTelefone"
+      />
+    </template>
     <template v-else-if="currentScreen === 'dados-acesso'">
-      <AccessDataScreen @voltar="goToProposta" @enviar="goToSenha" />
+      <AccessDataScreen :is-p-j="true" @voltar="goToPjPropostaOferta" @enviar="goToSenha" />
     </template>
     <template v-else-if="currentScreen === 'senha'">
       <SenhaScreen
+        :is-p-j="true"
         :email="accessPayload?.email ?? ''"
         :celular="accessPayload?.celular ?? ''"
         :canal="accessPayload?.canal ?? 'celular'"
@@ -334,13 +454,10 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
       <DadosPessoaisScreen @voltar="goToPropostaPersonalizada" @continuar="goToEnderecoTelefone" />
     </template>
     <template v-else-if="currentScreen === 'endereco-telefone'">
-      <EnderecoTelefoneScreen @voltar="goToDadosPessoais" @continuar="goToEnvioDocumentos" />
-    </template>
-    <template v-else-if="currentScreen === 'captura-selfie'">
-      <CapturaSelfieScreen @voltar="goToEnvioDocumentos" @continuar="goToDocumentosStatus" />
+      <EnderecoTelefoneScreen :is-p-j="true" @voltar="goToPjRepresentante" @continuar="goToEnvioDocumentos" />
     </template>
     <template v-else-if="currentScreen === 'envio-documentos'">
-      <EnvioDocumentosScreen :initialStep="envioDocStep" @voltar="goToEnderecoTelefone" @continuar="goToCapturaSelfie" />
+      <EnvioDocumentosScreen :initialStep="envioDocStep" :is-p-j="true" @voltar="goToEnderecoTelefone" @continuar="goToRevisao" />
     </template>
     <template v-else-if="currentScreen === 'documentos-status'">
       <DocumentosStatusScreen @voltar="goToCapturaSelfie" @continuar="goToConcluir" />
@@ -379,13 +496,14 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
     </template>
     <template v-else-if="currentScreen === 'revisao'">
       <RevisaoScreen
-        :valor="propostaValor"
-        :prazo="propostaPrazo"
-        :parcela="propostaParcela"
-        :taxaNominal="propostaTaxaNominal"
-        :taxaEfetiva="propostaTaxaEfetiva"
-        @gerarContrato="goToAutenticacaoSMS"
-        @voltar="goToAreaClienteII"
+        :is-p-j="true"
+        :valor="pjValorStr"
+        :prazo="pjPrazoStr"
+        :parcela="pjParcelaStr"
+        :taxaNominal="pjTaxaNomStr"
+        :taxaEfetiva="pjTaxaEfStr"
+        @gerarContrato="goToContrato"
+        @voltar="goToEnvioDocumentos"
         @navigate="handleAuthNav"
       />
     </template>
@@ -397,18 +515,30 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
     </template>
     <template v-else-if="currentScreen === 'contrato'">
       <ContratoScreen
-        :valor="propostaValor"
-        :prazo="oferta.installments"
-        :parcela="propostaParcela"
-        :taxaNominalMensal="(oferta.rate * 100).toFixed(2).replace('.', ',') + '% a.m.'"
-        :taxaNominalAnual="((Math.pow(1 + oferta.rate, 12) - 1) * 100).toFixed(2).replace('.', ',') + '% a.a.'"
-        @continuar="goToConclusao"
-        @voltar="goToCodigoSMS"
+        :is-p-j="true"
+        :razao-social="pjProposta?.razaoSocial ?? 'TRANS KOTHE TRANSPORTES RODOVIARIOS S/A'"
+        :cnpj="pjProposta?.cnpj ?? '03.052.564/0001-66'"
+        :valor="pjValorStr"
+        :prazo="pjPrazoMeses"
+        :parcela="pjParcelaStr"
+        :taxaNominalMensal="pjTaxaMensalStr"
+        :taxaNominalAnual="pjTaxaAnualStr"
+        @continuar="() => setScreen('pj-contrato-assinado')"
+        @voltar="goToRevisao"
         @navigate="handleAuthNav"
       />
     </template>
     <template v-else-if="currentScreen === 'conclusao'">
       <ConclusaoScreen :valor="propostaValor" @voltar="goToLanding" @navigate="handleAuthNav" />
+    </template>
+    <template v-else-if="currentScreen === 'pj-contrato-assinado'">
+      <PjContratoAssinadoScreen
+        :razao-social="pjProposta?.razaoSocial"
+        :valor-total="pjValorStr"
+        :prazo="pjPrazoStr"
+        :parcela="pjParcelaStr"
+        @acessar-dashboard="setScreen('pj-dashboard')"
+      />
     </template>
     <template v-else-if="currentScreen === 'meus-dados'">
       <MeusDadosScreen @voltar="goToAreaCliente" @navigate="handleAuthNav" />
@@ -443,6 +573,10 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   display: block;
 }
 
+.theme-pj .landing-nav__logo {
+  height: 44px;
+}
+
 .landing-nav__links {
   display: none;
   align-items: center;
@@ -458,7 +592,7 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
 }
 
 .landing-nav__links a:hover {
-  color: #00d8d8;
+  color: var(--color-primary-500);
 }
 
 .landing-nav__cta {
@@ -469,7 +603,7 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   padding: 0 24px;
   border: none;
   border-radius: 999px;
-  background: #00d8d8;
+  background: var(--btn-primary-bg);
   color: #ffffff;
   font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 15px;
@@ -477,8 +611,29 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   cursor: pointer;
 }
 
+.landing-nav__pj {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--color-primary-500);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-primary-500);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.landing-nav__pj:hover {
+  background: var(--color-primary-50);
+}
+
 .landing-nav__cta:hover {
-  background: #052c2f;
+  background: var(--btn-primary-bg-hover);
 }
 
 .landing-nav__btn {
@@ -501,7 +656,7 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   height: 2px;
   width: 18px;
   border-radius: 2px;
-  background: #00d8d8;
+  background: var(--btn-primary-bg);
   transition: transform 0.2s, opacity 0.2s;
 }
 
@@ -542,7 +697,7 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   height: 52px;
   border: none;
   border-radius: 999px;
-  background: #00d8d8;
+  background: var(--btn-primary-bg);
   color: #ffffff;
   font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 16px;
@@ -551,13 +706,47 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   transition: background 0.15s;
 }
 
-.landing-nav__drawer-cta:hover { background: #052c2f; }
+.landing-nav__drawer-cta:hover { background: var(--btn-primary-bg-hover); }
+
+.landing-nav__drawer-pj {
+  margin-top: 12px;
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--color-primary-500);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-primary-500);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.landing-nav__drawer-pj:hover { background: var(--color-primary-50); }
 
 @media (min-width: 1024px) {
   .landing-nav__drawer { display: none; }
 }
 
+.landing-above-fold-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-above-fold__video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .landing-above-fold {
+  position: relative;
+  z-index: 1;
   max-width: 1240px;
   margin: 0 auto;
   padding: 28px 20px 36px;
@@ -594,8 +783,8 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #dff3f1;
-  color: #0fa3a3;
+  background: #8f0000;
+  color: #ffffff;
   font-size: 11px;
   font-weight: 700;
   display: inline-flex;
@@ -620,6 +809,7 @@ const handleAuthNav = (action: 'sair' | 'emprestimos' | 'meus-dados') => {
   }
 
   .landing-nav__links,
+  .landing-nav__pj,
   .landing-nav__cta {
     display: inline-flex;
   }

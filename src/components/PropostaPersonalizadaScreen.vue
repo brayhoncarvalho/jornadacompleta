@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { formatCurrencyBRL } from '../utils/formatters'
+import { calculatePricePMT } from '../lib/financeCalculations'
 
 const emit = defineEmits<{
   (e: 'voltar'): void
@@ -19,14 +21,11 @@ const taxaPorPrazo: Record<number, number> = {
   36: 0.0349,
 }
 
-const calcPmt = (pv: number, n: number, i: number): number =>
-  (pv * (i * Math.pow(1 + i, n))) / (Math.pow(1 + i, n) - 1)
+const calcPmt = (pv: number, n: number, i: number): number => calculatePricePMT(pv, i, n)
 
-const fmt = (v: number) =>
-  v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const fmt = (v: number) => formatCurrencyBRL(v)
 
-const fmtNoDecimals = (v: number) =>
-  v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+const fmtNoDecimals = (v: number) => formatCurrencyBRL(v, 0)
 
 // Valor editável pelo usuário
 const loanAmount = ref(props.valorSolicitado)

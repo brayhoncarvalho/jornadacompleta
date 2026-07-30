@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { usePJBrand } from '../composables/usePJBrand'
 
 const props = withDefaults(
-  defineProps<{ initialStep?: 'tipo' | 'upload' }>(),
-  { initialStep: 'tipo' }
+  defineProps<{ initialStep?: 'tipo' | 'upload'; isPJ?: boolean }>(),
+  { initialStep: 'tipo', isPJ: false }
 )
 
 const emit = defineEmits<{
@@ -33,6 +34,11 @@ const makeDoc = (mockName = ''): DocState => ({
 const docFrente = ref<DocState>(makeDoc('rg_frente.jpg'))
 const docVerso  = ref<DocState>(makeDoc('rg_verso.jpg'))
 
+// Docs PJ
+const docContratoSocial = ref<DocState>(makeDoc('contrato_social.pdf'))
+const docCartaoCNPJ     = ref<DocState>(makeDoc('cartao_cnpj.pdf'))
+const docRepresentante  = ref<DocState>(makeDoc('doc_representante.jpg'))
+
 const handleFileSelect = (doc: ReturnType<typeof ref<DocState>>, e: Event) => {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0] ?? null
@@ -59,7 +65,7 @@ const errors = ref<Record<string, string>>({ docFrente: '' })
 const submitted = ref(false)
 
 // -- Etapa de seleção do tipo de documento ------------------
-const step = ref<'tipo' | 'upload'>(props.initialStep)
+const step = ref<'tipo' | 'upload'>(props.isPJ ? 'upload' : props.initialStep)
 const tipoDoc = ref<'ci' | 'cnh' | null>(null)
 const tipoDocLabel = computed(() =>
   tipoDoc.value === 'cnh' ? 'Carteira Nacional de Habilitação' : 'Cédula de Identidade'
@@ -72,7 +78,11 @@ const tipoDocHint = computed(() =>
 const proceedToUpload = () => { if (tipoDoc.value) step.value = 'upload' }
 
 const validate = (): boolean => {
-  errors.value.docFrente = docFrente.value.status === 'idle' ? 'Anexe a frente do documento.' : ''
+  if (props.isPJ) {
+    errors.value.docFrente = docContratoSocial.value.status === 'idle' ? 'Anexe o Contrato Social ou Última Alteração.' : ''
+  } else {
+    errors.value.docFrente = docFrente.value.status === 'idle' ? 'Anexe a frente do documento.' : ''
+  }
   return !Object.values(errors.value).some(e => e !== '')
 }
 
@@ -81,15 +91,17 @@ const handleProximo = () => {
   if (!validate()) return
   emit('continuar')
 }
+
+const { logoSrc, logoAlt } = usePJBrand(() => props.isPJ)
 </script>
 
 <template>
-  <div class="ed-screen">
+  <div class="ed-screen" :class="{ 'is-pj': isPJ }">
 
     <header class="proposal-header">
       <div class="proposal-header__inner">
-        <img src="/assets/dock-logo-color.png" alt="Dock" class="proposal-header__logo" />
-        <button type="button" class="proposal-header__back" @click="step === 'upload' ? (step = 'tipo') : emit('voltar')" aria-label="Voltar">
+        <img :src="logoSrc" :alt="logoAlt" class="proposal-header__logo" />
+        <button type="button" class="proposal-header__back" @click="props.isPJ ? emit('voltar') : (step === 'upload' ? (step = 'tipo') : emit('voltar'))" aria-label="Voltar">
           <span aria-hidden="true">←</span> Voltar
         </button>
       </div>
@@ -100,18 +112,18 @@ const handleProximo = () => {
 
         <!-- Stepper: passos 1-3 done, passo 4 ativo -->
         <ol class="proposal-steps" aria-label="Progresso da proposta">
-          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark" aria-hidden="true">✓</span><span class="proposal-steps__label">DADOS INICIAIS</span></li>
+          <li class="proposal-steps__item is-done"><span class="proposal-steps__mark" aria-hidden="true">✓</span><span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark" aria-hidden="true">✓</span><span class="proposal-steps__label">PROPOSTA</span></li>
           <li class="proposal-steps__item is-done"><span class="proposal-steps__mark" aria-hidden="true">✓</span><span class="proposal-steps__label">CADASTRO</span></li>
           <li class="proposal-steps__item is-active"><span class="proposal-steps__mark" aria-hidden="true">4</span><span class="proposal-steps__label">DOCUMENTOS</span></li>
-          <li class="proposal-steps__item"><span class="proposal-steps__mark" aria-hidden="true">5</span><span class="proposal-steps__label">CONCLUSÃO</span></li>
+          <li class="proposal-steps__item"><span class="proposal-steps__mark" aria-hidden="true">5</span><span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span></li>
         </ol>
 
         <h1 class="ed-title">Envio de Documentos</h1>
         <p class="ed-subtitle">Anexe os documentos necessários para análise da sua proposta.</p>
 
         <!-- Passo 1: Seleção do tipo de documento -->
-        <div v-if="step === 'tipo'" class="proposal-form ed-tipo-form">
+        <div v-if="!props.isPJ && step === 'tipo'" class="proposal-form ed-tipo-form">
           <p class="ed-tipo-label">Selecione o tipo de documento de identificação que será enviado:</p>
           <div class="doc-type-options" role="radiogroup" aria-label="Tipo de documento">
             <label class="doc-type-option">
@@ -142,8 +154,8 @@ const handleProximo = () => {
           <button type="button" class="proposal-submit" :disabled="!tipoDoc" @click="proceedToUpload">Continuar</button>
         </div>
 
-        <!-- Passo 2: Upload dos documentos -->
-        <div v-if="step === 'upload'" class="proposal-form">
+        <!-- Passo 2: Upload dos documentos (PF) -->
+        <div v-if="!props.isPJ && step === 'upload'" class="proposal-form">
 
           <!-- Documento de identificação -->
           <div class="doc-card" :class="{ 'doc-card--error': submitted && errors.docFrente }">
@@ -198,13 +210,106 @@ const handleProximo = () => {
             </label>
             <p v-if="submitted && errors.docFrente" class="field-error" role="alert">{{ errors.docFrente }}</p>
           </div>
+        </div>
 
-          <!-- CTAs -->
-          <div class="dp-actions">
-            <button type="button" class="dp-btn-back" @click="step = 'tipo'">Anterior</button>
-            <button type="button" class="proposal-submit" @click="handleProximo">Próximo</button>
+        <!-- Upload PJ: Contrato Social + Cartão CNPJ + Doc Representante -->
+        <div v-if="props.isPJ" class="proposal-form">
+
+          <!-- Contrato Social -->
+          <div class="doc-card" :class="{ 'doc-card--error': submitted && errors.docFrente }">
+            <div class="doc-card__header">
+              <svg class="doc-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div>
+                <p class="doc-card__name">Contrato Social ou Última Alteração</p>
+                <p class="doc-card__hint">Documento registrado em cartório. PDF ou imagem.</p>
+              </div>
+            </div>
+            <div v-if="docContratoSocial.status !== 'idle'" class="doc-card__preview-area">
+              <img v-if="docContratoSocial.preview" :src="docContratoSocial.preview" alt="Contrato Social" class="doc-card__preview-img" />
+              <div v-else class="doc-card__file-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f0000" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>{{ docContratoSocial.file?.name ?? docContratoSocial.mockName }}</span>
+              </div>
+              <button type="button" class="doc-card__remove" @click="removeDoc(docContratoSocial)" aria-label="Remover Contrato Social">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <label v-if="docContratoSocial.status === 'idle'" class="doc-card__btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              Anexar documento
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docContratoSocial, $event)" />
+            </label>
+            <label v-else class="doc-card__change-link">
+              Trocar arquivo
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docContratoSocial, $event)" />
+            </label>
+            <p v-if="submitted && errors.docFrente" class="field-error" role="alert">{{ errors.docFrente }}</p>
           </div>
 
+          <!-- Cartão CNPJ -->
+          <div class="doc-card">
+            <div class="doc-card__header">
+              <svg class="doc-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              <div>
+                <p class="doc-card__name">Cartão CNPJ <span class="et-optional">(opcional)</span></p>
+                <p class="doc-card__hint">Comprovante emitido pela Receita Federal.</p>
+              </div>
+            </div>
+            <div v-if="docCartaoCNPJ.status !== 'idle'" class="doc-card__preview-area">
+              <div class="doc-card__file-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f0000" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>{{ docCartaoCNPJ.file?.name ?? docCartaoCNPJ.mockName }}</span>
+              </div>
+              <button type="button" class="doc-card__remove" @click="removeDoc(docCartaoCNPJ)" aria-label="Remover Cartão CNPJ">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <label v-if="docCartaoCNPJ.status === 'idle'" class="doc-card__btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              Anexar documento
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docCartaoCNPJ, $event)" />
+            </label>
+            <label v-else class="doc-card__change-link">
+              Trocar arquivo
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docCartaoCNPJ, $event)" />
+            </label>
+          </div>
+
+          <!-- Documento do Representante Legal -->
+          <div class="doc-card">
+            <div class="doc-card__header">
+              <svg class="doc-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div>
+                <p class="doc-card__name">Documento do Representante Legal <span class="et-optional">(opcional)</span></p>
+                <p class="doc-card__hint">RG ou CNH — frente e verso legíveis.</p>
+              </div>
+            </div>
+            <div v-if="docRepresentante.status !== 'idle'" class="doc-card__preview-area">
+              <img v-if="docRepresentante.preview" :src="docRepresentante.preview" alt="Documento do Representante" class="doc-card__preview-img" />
+              <div v-else class="doc-card__file-name">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f0000" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>{{ docRepresentante.file?.name ?? docRepresentante.mockName }}</span>
+              </div>
+              <button type="button" class="doc-card__remove" @click="removeDoc(docRepresentante)" aria-label="Remover Documento do Representante">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <label v-if="docRepresentante.status === 'idle'" class="doc-card__btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              Anexar documento
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docRepresentante, $event)" />
+            </label>
+            <label v-else class="doc-card__change-link">
+              Trocar arquivo
+              <input type="file" accept="image/*,application/pdf" class="doc-sr-only" @change="handleFileSelect(docRepresentante, $event)" />
+            </label>
+          </div>
+
+          <!-- CTAs PJ -->
+          <div class="dp-actions">
+            <button type="button" class="dp-btn-back" @click="emit('voltar')">Anterior</button>
+            <button type="button" class="proposal-submit" @click="handleProximo">Próximo</button>
+          </div>
           <p class="proposal-safe"><span aria-hidden="true">✓</span>Documentos protegidos com criptografia SSL</p>
         </div>
 
@@ -219,6 +324,7 @@ const handleProximo = () => {
 .proposal-header { position: sticky; top: 0; z-index: 10; background: var(--color-gray-50); border-bottom: 1px solid var(--color-primary-100); }
 .proposal-header__inner { max-width: 1024px; margin: 0 auto; padding: 0 20px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
 .proposal-header__logo { height: 24px; width: auto; }
+.is-pj .proposal-header__logo { height: 44px; }
 .proposal-header__back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--color-primary-100); border-radius: 999px; background: transparent; color: var(--color-navy-800); font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
 .proposal-header__back:hover { background: var(--color-primary-50); }
 
@@ -256,7 +362,7 @@ const handleProximo = () => {
 .doc-card__preview-img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
 .doc-card__file-name { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: var(--color-navy-800); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .doc-card__remove { margin-left: auto; flex-shrink: 0; background: transparent; border: none; cursor: pointer; color: #dc3545; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-.doc-card__remove:hover { background: #fee2e2; }
+.doc-card__remove:hover { background: var(--color-danger-100); }
 
 .doc-card__btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1.5px dashed var(--color-primary-200); border-radius: 10px; background: var(--color-primary-50); color: var(--color-primary-500); font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s; align-self: flex-start; }
 .doc-card__btn:hover { background: var(--color-primary-100); border-color: var(--color-primary-500); }

@@ -52,29 +52,29 @@
           </p>
         </div>
 
-        <div class="beneficios__seguranca-list" role="list" aria-label="Pilares de segurança">
-          <article class="beneficios__seguranca-item" role="listitem">
+        <ul class="beneficios__seguranca-list" aria-label="Pilares de segurança">
+          <li class="beneficios__seguranca-item">
             <span aria-hidden="true">✓</span>
             <div>
               <p>Regulação Bacen</p>
               <small>Operação supervisionada e aderente às normas.</small>
             </div>
-          </article>
-          <article class="beneficios__seguranca-item" role="listitem">
+          </li>
+          <li class="beneficios__seguranca-item">
             <span aria-hidden="true">✓</span>
             <div>
               <p>Proteção de dados</p>
               <small>Processamento conforme LGPD e boas práticas de mercado.</small>
             </div>
-          </article>
-          <article class="beneficios__seguranca-item" role="listitem">
+          </li>
+          <li class="beneficios__seguranca-item">
             <span aria-hidden="true">✓</span>
             <div>
               <p>Jornada transparente</p>
               <small>Custos e condições explicados antes da contratação.</small>
             </div>
-          </article>
-        </div>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -86,8 +86,8 @@
           <p>Separamos as perguntas mais comuns. Se precisar de mais ajuda, fale com a gente.</p>
         </div>
 
-        <div class="beneficios__faq-list" role="list" aria-label="Perguntas frequentes">
-          <article v-for="item in faq" :key="item.id" class="beneficios__faq-item" role="listitem">
+        <ul class="beneficios__faq-list" aria-label="Perguntas frequentes">
+          <li v-for="item in faq" :key="item.id" class="beneficios__faq-item">
             <button
               type="button"
               class="beneficios__faq-btn"
@@ -101,8 +101,8 @@
             <p v-if="openFaqId === item.id" :id="`faq-${item.id}`" class="beneficios__faq-answer">
               {{ item.a }}
             </p>
-          </article>
-        </div>
+          </li>
+        </ul>
       </div>
 
       <div class="beneficios__cta-final" aria-label="Chamada final">
@@ -203,7 +203,7 @@ const toggleFaq = (id: number) => {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: rgba(0, 136, 136, 0.12);
+  background: var(--color-primary-100);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,7 @@ const toggleFaq = (id: number) => {
   height: 28px;
   object-fit: contain;
   display: block;
-  filter: brightness(0) saturate(100%) invert(35%) sepia(90%) saturate(600%) hue-rotate(150deg) brightness(90%);
+  filter: var(--beneficios-icon-filter, brightness(0) saturate(100%) invert(35%) sepia(90%) saturate(600%) hue-rotate(150deg) brightness(90%));
 }
 
 .beneficios__card-title {
@@ -300,6 +300,9 @@ const toggleFaq = (id: number) => {
 .beneficios__seguranca-list {
   display: grid;
   gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .beneficios__seguranca-item {
@@ -331,14 +334,14 @@ const toggleFaq = (id: number) => {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 16px;
   font-weight: 600;
-  color: var(--color-navy-800);
+  color: var(--seguranca-item-title-color, var(--color-navy-800));
 }
 
 .beneficios__seguranca-item small {
   margin: 0;
   font-family: 'Instrument Sans', sans-serif;
   font-size: 16px;
-  color: var(--color-navy-600);
+  color: var(--seguranca-item-color, var(--color-navy-600));
 }
 
 .beneficios__faq {
@@ -367,6 +370,9 @@ const toggleFaq = (id: number) => {
 
 .beneficios__faq-list {
   border-top: 1px solid var(--color-primary-100);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .beneficios__faq-item {

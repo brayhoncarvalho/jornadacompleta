@@ -32,8 +32,8 @@
   --color-navy-100: #d8e1ef;
   --color-navy-200: #b3c2dc;
   --color-navy-300: #7f9abf;
-  --color-navy-400: #4d74a2;
-  --color-navy-500: #2b5080;
+  --color-navy-400: #3c4043;
+  --color-navy-500: #3c4043;
   --color-navy-600: #243854;
   --color-navy-700: #1a2e4a;
   --color-navy-800: #0f1e33;
@@ -197,6 +197,28 @@
   --btn-primary-bg:           var(--color-primary-500); /* Fundo normal          */
   --btn-primary-bg-hover:     var(--color-primary-600); /* Fundo no hover        */
   --btn-primary-color:        #ffffff;                  /* Texto normal e hover  */
+}
+
+/* ============================================================
+   TEMA PJ — Rede Frota
+   Aplicado via classe .theme-pj no wrapper da jornada PJ.
+   Sobrescreve os tokens primários com o vermelho da marca.
+   ============================================================ */
+.theme-pj {
+  --color-primary-50:      #fff5f5;
+  --color-primary-100:     #fde8e8;
+  --color-primary-200:     #fcc5c5;
+  --color-primary-300:     #f99999;
+  --color-primary-500:     #8f0000;
+  --color-primary-600:     #6b0000;
+  --color-secondary-600:   #8f0000;
+  --color-secondary-700:   #6b0000;
+  --beneficios-icon-filter: brightness(0) saturate(100%) invert(10%) sepia(97%) saturate(5800%) hue-rotate(357deg) brightness(85%);
+  --seguranca-item-color:   #ffffff;
+  --seguranca-item-title-color: #ffffff;
+  --btn-primary-bg:        #8f0000;
+  --btn-primary-bg-hover:  #6b0000;
+  --btn-primary-color:     #ffffff;
 }
 
 /* DARK MODE DESABILITADO — Landing page é sempre light mode */

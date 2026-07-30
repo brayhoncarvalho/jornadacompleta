@@ -2,6 +2,7 @@
 import { ref, reactive, nextTick, withDefaults, defineProps } from 'vue'
 import { maskCPF, maskCurrencyBRL, onlyDigits } from '../utils/masks'
 import { validateCPF, validateDate, validateName } from '../utils/validators'
+import { formatCurrencyBRL } from '../utils/formatters'
 
 const emit = defineEmits<{
   (e: 'voltar'): void
@@ -17,7 +18,7 @@ const IS_DEV_PREFILL = true
 
 // Pré-preencher valor com o da simulação, se informado; caso contrário, usar mock de dev
 const valorInicialFormatado = props.valorInicial > 0
-  ? props.valorInicial.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  ? formatCurrencyBRL(props.valorInicial)
   : (IS_DEV_PREFILL ? 'R$ 3.500,00' : '')
 
 // Campos do formulário

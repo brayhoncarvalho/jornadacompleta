@@ -1,0 +1,248 @@
+[
+  {
+    "id": "storybook-default-no-question",
+    "mode": "storybook",
+    "prompt": "Crie um formulário de busca com input, select e botão usando o padrão do projeto.",
+    "mustInclude": [
+      "shared-design-system-vue-lib",
+      "DsInput",
+      "DsSelect",
+      "DsButton"
+    ],
+    "mustNotInclude": [
+      "Esse trabalho parte de uma referência no Figma",
+      "DESIGN_SYSTEM.md"
+    ]
+  },
+  {
+    "id": "ambiguous-must-ask-once",
+    "mode": "ambiguous",
+    "prompt": "Crie uma tela de login.",
+    "mustAsk": [
+      "Figma",
+      "DS Storybook"
+    ],
+    "mustNotInclude": [
+      "Vou seguir o Figma automaticamente",
+      "Vou seguir o Storybook automaticamente"
+    ]
+  },
+  {
+    "id": "figma-explicit-needs-fidelity",
+    "mode": "figma",
+    "prompt": "Implemente essa tela do Figma com base no print anexado.",
+    "mustInclude": [
+      "DESIGN_SYSTEM.md",
+      "pixel",
+      "print",
+      "não invente"
+    ],
+    "mustAsk": [
+      "ícones",
+      "public/"
+    ]
+  },
+  {
+    "id": "slider-critical-rules",
+    "mode": "figma",
+    "prompt": "Crie um slider para simulação de empréstimo igual ao design.",
+    "mustInclude": [
+      "input type=\"range\"",
+      "#ffffff",
+      "24x24",
+      "appearance: none",
+      "ESQUERDA",
+      "DIREITA"
+    ],
+    "mustNotInclude": [
+      "thumb amarelo",
+      "botão + à esquerda"
+    ]
+  },
+  {
+    "id": "icons-must-ask",
+    "mode": "figma",
+    "prompt": "Adicione os ícones que aparecem no layout do Figma.",
+    "mustAsk": [
+      "Você quer fornecer os ícones",
+      "Ou prefere que eu crie SVGs inline"
+    ],
+    "mustNotInclude": [
+      "criei os ícones automaticamente",
+      "usei um placeholder"
+    ]
+  },
+  {
+    "id": "a11y-form-wcag",
+    "mode": "storybook",
+    "prompt": "Crie um formulário de contato com nome, email e mensagem.",
+    "mustInclude": [
+      "aria-label",
+      "aria-describedby",
+      "label",
+      "4.5:1"
+    ],
+    "mustNotInclude": [
+      "apenas cor para indicar erro",
+      "tabindex=\"2\""
+    ],
+    "notes": "Valida WCAG 1.3.1 (labels), 3.3.1 (erro), 3.3.2 (instruções), 4.1.2 (nome acessível)"
+  },
+  {
+    "id": "a11y-loading-state-aria",
+    "mode": "storybook",
+    "prompt": "Adicione um skeleton de carregamento para a listagem de usuários.",
+    "mustInclude": [
+      "aria-live",
+      "role=\"status\"",
+      "aria-busy",
+      "aria-label"
+    ],
+    "mustNotInclude": [
+      "sem atributos aria",
+      "div vazia"
+    ],
+    "notes": "Valida WCAG 4.1.3 (status messages), Nielsen H1 (visibilidade do estado)"
+  },
+  {
+    "id": "a11y-keyboard-navigation",
+    "mode": "storybook",
+    "prompt": "Crie um menu dropdown de navegação.",
+    "mustInclude": [
+      "tabindex",
+      "aria-expanded",
+      "Escape",
+      "role=\"menu\""
+    ],
+    "mustNotInclude": [
+      "onclick apenas",
+      "sem keyboard"
+    ],
+    "notes": "Valida WCAG 2.1.1 (keyboard), 2.4.3 (focus order), 4.1.2 (name, role, value)"
+  },
+  {
+    "id": "a11y-error-not-color-only",
+    "mode": "storybook",
+    "prompt": "Mostre erro de validação no campo de CPF.",
+    "mustInclude": [
+      "aria-describedby",
+      "aria-invalid",
+      "ícone"
+    ],
+    "mustNotInclude": [
+      "apenas vermelho",
+      "border-red"
+    ],
+    "notes": "Valida WCAG 1.4.1 (uso de cor), 3.3.1 (identificação de erro), Nielsen H9 (recuperação de erros)"
+  },
+  {
+    "id": "nielsen-h1-visibility-state",
+    "mode": "storybook",
+    "prompt": "Crie um botão de submit que mostre progresso do envio.",
+    "mustInclude": [
+      "aria-busy",
+      "disabled",
+      "Enviando"
+    ],
+    "mustNotInclude": [
+      "sem feedback visual",
+      "botão normal durante submit"
+    ],
+    "notes": "Valida Nielsen H1 (visibilidade do estado do sistema)"
+  },
+  {
+    "id": "nielsen-h3-control-freedom",
+    "mode": "storybook",
+    "prompt": "Crie um modal de confirmação para exclusão de item.",
+    "mustInclude": [
+      "Cancelar",
+      "aria-modal",
+      "Escape",
+      "role=\"dialog\""
+    ],
+    "mustNotInclude": [
+      "sem botão cancelar",
+      "sem foco trap"
+    ],
+    "notes": "Valida Nielsen H3 (controle e liberdade), WCAG 2.1.1 (keyboard), H5 (prevenção de erros)"
+  },
+  {
+    "id": "color-harmony-no-rainbow",
+    "mode": "storybook",
+    "prompt": "Crie um dashboard com 4 cards de métricas (saldo, receitas, despesas, pendências).",
+    "mustInclude": [
+      "var(--color-",
+      "surface"
+    ],
+    "mustNotInclude": [
+      "bg-success",
+      "bg-warning",
+      "bg-info",
+      "cada card com uma cor",
+      "fundo colorido"
+    ],
+    "notes": "Valida color-harmony: cards usam superfície neutra; cores de feedback NÃO decoram. Anti-arco-íris (regra 60-30-10)."
+  },
+  {
+    "id": "color-harmony-feedback-state-only",
+    "mode": "storybook",
+    "prompt": "Mostre o status de cada parcela (paga, pendente, vencida) numa lista.",
+    "mustInclude": [
+      "ícone",
+      "texto",
+      "var(--color-feedback"
+    ],
+    "mustNotInclude": [
+      "apenas cor",
+      "só a cor"
+    ],
+    "notes": "Cor de feedback comunica estado COM ícone+texto (não só cor — WCAG 1.4.1). Uso legítimo, não decorativo."
+  },
+  {
+    "id": "component-states-complete",
+    "mode": "storybook",
+    "prompt": "Crie um botão de salvar que envia um formulário para a API.",
+    "mustInclude": [
+      "loading",
+      "disabled",
+      "aria-busy",
+      "hover",
+      "focus"
+    ],
+    "mustNotInclude": [
+      "sem estado de loading",
+      "botão que não desabilita durante submit"
+    ],
+    "notes": "Valida a máquina de estados obrigatória (frontend-master Parte 6): idle/hover/focus/active/loading/disabled."
+  },
+  {
+    "id": "prefer-existing-ds-component",
+    "mode": "storybook",
+    "prompt": "Preciso de um modal de confirmação e de um seletor de data no formulário.",
+    "mustInclude": [
+      "DsConfirmModal",
+      "DsDatePicker"
+    ],
+    "mustNotInclude": [
+      "criar modal do zero",
+      "<dialog",
+      "input type=\"date\" nativo"
+    ],
+    "notes": "Valida anti-duplicação: DsConfirmModal e DsDatePicker existem no manifest do DS — reusar, não recriar (C.6)."
+  },
+  {
+    "id": "no-hardcoded-spacing-radius",
+    "mode": "storybook",
+    "prompt": "Crie um card com padding interno e cantos arredondados.",
+    "mustInclude": [
+      "var(--space",
+      "var(--radius"
+    ],
+    "mustNotInclude": [
+      "padding: 18px",
+      "rounded-[5px]",
+      "p-[18px]"
+    ],
+    "notes": "Valida no-hardcoded-design-values: spacing/radius via token, nunca hardcoded."
+  }
+]

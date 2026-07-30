@@ -9,11 +9,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "paths": {
-      "@dock/console-uikit-vue": ["./src/lib/dock-ds-stub.ts"],
-      "@dock/console-uikit-vue/style.css": ["./src/lib/dock-ds-stub.css"]
-    }
+    "noEmit": true
   },
   "include": ["src/**/*", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]

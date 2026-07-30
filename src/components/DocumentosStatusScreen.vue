@@ -95,7 +95,7 @@ const docs = [
 .ds-doc-card__check { width: 44px; height: 44px; border-radius: 50%; background: var(--btn-primary-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .ds-doc-card__body { flex: 1; min-width: 0; }
 .ds-doc-card__name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: var(--color-navy-800); margin: 0 0 3px; line-height: 1.3; }
-.ds-doc-card__status { font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #00a87a; font-weight: 600; margin: 0; }
+.ds-doc-card__status { font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: var(--color-success-text); font-weight: 600; margin: 0; }
 .ds-doc-card__more { margin-left: auto; flex-shrink: 0; background: none; border: 1.5px solid var(--color-primary-200); border-radius: 999px; padding: 6px 14px; font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--color-primary-500); cursor: pointer; white-space: nowrap; }
 .ds-doc-card__more:hover { background: var(--color-primary-100); }
 .dp-actions { display: flex; gap: 12px; margin-top: 8px; }

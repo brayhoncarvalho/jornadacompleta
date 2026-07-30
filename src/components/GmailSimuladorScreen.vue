@@ -98,7 +98,7 @@ const dataEmail = new Date().toLocaleDateString('pt-BR', {
             <div class="gm-email__avatar" aria-hidden="true">DT</div>
             <div class="gm-email__meta">
               <div class="gm-email__from-row">
-                <span class="gm-email__from-name">Dock Tech</span>
+                <span class="gm-email__from-name">Rede Frota</span>
                 <span class="gm-email__from-email">&lt;noreply@dock.tech&gt;</span>
                 <span class="gm-email__date">{{ dataEmail }}</span>
               </div>

@@ -18,8 +18,8 @@ const usuario = {
 const endereco = {
   cep: '77001-000',
   logradouro: 'Rua das Palmeiras, 452',
-  bairro: 'Plano Diretor Norte',
-  cidade: 'Palmas',
+  bairro: 'Setor Oeste',
+  cidade: 'Araguaína',
   uf: 'TO',
   tipoResidencia: 'Própria',
 }

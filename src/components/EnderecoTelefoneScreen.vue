@@ -1,19 +1,27 @@
 <script setup lang="ts">
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, computed } from 'vue'
 import { onlyDigits } from '../utils/masks'
+import { usePJBrand } from '../composables/usePJBrand'
+
+const props = withDefaults(
+  defineProps<{ isPJ?: boolean }>(),
+  { isPJ: false }
+)
 
 const emit = defineEmits<{
   (e: 'voltar'): void
   (e: 'continuar'): void
 }>()
 
+const { logoSrc, logoAlt } = usePJBrand(() => props.isPJ)
+
 // Dados de endereço
 const cep = ref('77001-000')
 const endereco = ref('Rua das Palmeiras')
 const numero = ref('452')
 const complemento = ref('')
-const bairro = ref('Plano Diretor Norte')
-const cidade = ref('Palmas')
+const bairro = ref('Setor Oeste')
+const cidade = ref('Araguaína')
 const estado = ref('TO')
 const tipoResidencia = ref('Própria')
 
@@ -76,7 +84,7 @@ function validate(field: Field) {
     bairro: () => !bairro.value.trim() ? 'Bairro é obrigatório.' : '',
     cidade: () => !cidade.value.trim() ? 'Cidade é obrigatória.' : '',
     estado: () => !estado.value ? 'Estado é obrigatório.' : '',
-    tipoResidencia: () => !tipoResidencia.value ? 'Tipo de Residência é obrigatório.' : '',
+    tipoResidencia: () => !tipoResidencia.value ? `${tipoLabel.value} é obrigatório.` : '',
     celularDDD: () => onlyDigits(celularDDD.value).length < 2 ? 'DDD inválido.' : '',
     celularNum: () => onlyDigits(celularNum.value).length < 8 ? 'Celular inválido.' : '',
     canalContato: () => !canalContato.value ? 'Canal de Contato é obrigatório.' : '',
@@ -120,17 +128,20 @@ const estadosBrasil = [
 ]
 
 const tiposResidencia = ['Própria', 'Alugada', 'Financiada', 'Cedida', 'Funcional', 'Outra']
+const tiposEstabelecimento = ['Sede Própria', 'Sede Alugada', 'Coworking', 'Filial', 'Outra']
+const tiposLocal = computed(() => props.isPJ ? tiposEstabelecimento : tiposResidencia)
+const tipoLabel = computed(() => props.isPJ ? 'Tipo de Estabelecimento' : 'Tipo de Residência')
 const canaisContato = ['Telefone', 'E-mail', 'WhatsApp']
 const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
 </script>
 
 <template>
-  <div class="et-screen">
+  <div class="et-screen" :class="{ 'is-pj': isPJ }">
 
     <!-- Header -->
     <header class="proposal-header">
       <div class="proposal-header__inner">
-        <img src="/assets/dock-logo-color.png" alt="Dock" class="proposal-header__logo" />
+        <img :src="logoSrc" :alt="logoAlt" class="proposal-header__logo" />
         <button type="button" class="proposal-header__back" @click="emit('voltar')" aria-label="Voltar">
           <span aria-hidden="true">←</span>
           Voltar
@@ -145,7 +156,7 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
         <ol class="proposal-steps" aria-label="Progresso da proposta">
           <li class="proposal-steps__item is-done">
             <span class="proposal-steps__mark" aria-hidden="true">✓</span>
-            <span class="proposal-steps__label">DADOS INICIAIS</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'EMPRESA' : 'DADOS INICIAIS' }}</span>
           </li>
           <li class="proposal-steps__item is-done">
             <span class="proposal-steps__mark" aria-hidden="true">✓</span>
@@ -161,7 +172,7 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
           </li>
           <li class="proposal-steps__item">
             <span class="proposal-steps__mark" aria-hidden="true">5</span>
-            <span class="proposal-steps__label">CONCLUSÃO</span>
+            <span class="proposal-steps__label">{{ props.isPJ ? 'REVISÃO' : 'CONCLUSÃO' }}</span>
           </li>
         </ol>
 
@@ -178,10 +189,12 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
               <!-- CEP (largura dupla para acomodar hint) -->
               <div class="proposal-field et-full-width">
                 <label for="et-cep">CEP</label>
-                <input id="et-cep" :value="cep" type="text" inputmode="numeric"
+                <input
+id="et-cep" :value="cep" type="text" inputmode="numeric"
                   placeholder="00000-000" maxlength="9"
                   :class="['proposal-input et-cep-input', errors.cep && touched.cep ? 'is-error' : '']"
-                  @input="onCepInput" @blur="validate('cep')" />
+                  @input="onCepInput" @blur="validate('cep')"
+/>
                 <p class="et-cep-hint">Não sabe o CEP? <a href="https://buscacepinter.correios.com.br" target="_blank" rel="noopener noreferrer" class="et-cep-link">Consulte aqui</a>.</p>
                 <p v-if="errors.cep && touched.cep" class="field-error" role="alert">{{ errors.cep }}</p>
               </div>
@@ -189,43 +202,53 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
               <!-- Logradouro (full width) -->
               <div class="proposal-field et-full-width">
                 <label for="et-endereco">Logradouro</label>
-                <input id="et-endereco" v-model="endereco" type="text" placeholder="Rua, Avenida, Travessa..."
+                <input
+id="et-endereco" v-model="endereco" type="text" placeholder="Rua, Avenida, Travessa..."
                   :class="['proposal-input', errors.endereco && touched.endereco ? 'is-error' : '']"
-                  @blur="validate('endereco')" />
+                  @blur="validate('endereco')"
+/>
                 <p v-if="errors.endereco && touched.endereco" class="field-error" role="alert">{{ errors.endereco }}</p>
               </div>
 
               <!-- Número -->
               <div class="proposal-field">
                 <label for="et-numero">Número</label>
-                <input id="et-numero" v-model="numero" type="text" placeholder="Nº"
+                <input
+id="et-numero" v-model="numero" type="text" placeholder="Nº"
                   :class="['proposal-input', errors.numero && touched.numero ? 'is-error' : '']"
-                  @blur="validate('numero')" />
+                  @blur="validate('numero')"
+/>
                 <p v-if="errors.numero && touched.numero" class="field-error" role="alert">{{ errors.numero }}</p>
               </div>
 
               <!-- Complemento -->
               <div class="proposal-field">
                 <label for="et-complemento">Complemento <span class="et-optional">(opcional)</span></label>
-                <input id="et-complemento" v-model="complemento" type="text" placeholder="Apto, Bloco..."
-                  class="proposal-input" />
+                <input
+id="et-complemento" v-model="complemento" type="text" placeholder="Apto, Bloco..."
+                  class="proposal-input"
+/>
               </div>
 
               <!-- Bairro -->
               <div class="proposal-field">
                 <label for="et-bairro">Bairro</label>
-                <input id="et-bairro" v-model="bairro" type="text" placeholder="Seu bairro"
+                <input
+id="et-bairro" v-model="bairro" type="text" placeholder="Seu bairro"
                   :class="['proposal-input', errors.bairro && touched.bairro ? 'is-error' : '']"
-                  @blur="validate('bairro')" />
+                  @blur="validate('bairro')"
+/>
                 <p v-if="errors.bairro && touched.bairro" class="field-error" role="alert">{{ errors.bairro }}</p>
               </div>
 
               <!-- Cidade -->
               <div class="proposal-field">
                 <label for="et-cidade">Cidade</label>
-                <input id="et-cidade" v-model="cidade" type="text" placeholder="Sua cidade"
+                <input
+id="et-cidade" v-model="cidade" type="text" placeholder="Sua cidade"
                   :class="['proposal-input', errors.cidade && touched.cidade ? 'is-error' : '']"
-                  @blur="validate('cidade')" />
+                  @blur="validate('cidade')"
+/>
                 <p v-if="errors.cidade && touched.cidade" class="field-error" role="alert">{{ errors.cidade }}</p>
               </div>
 
@@ -233,9 +256,11 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
               <div class="proposal-field">
                 <label for="et-estado">Estado (UF)</label>
                 <div class="dp-select-wrap">
-                  <select id="et-estado" v-model="estado"
+                  <select
+id="et-estado" v-model="estado"
                     :class="['proposal-select', errors.estado && touched.estado ? 'is-error' : '']"
-                    @blur="validate('estado')">
+                    @blur="validate('estado')"
+>
                     <option value="" disabled>Selecione</option>
                     <option v-for="uf in estadosBrasil" :key="uf" :value="uf">{{ uf }}</option>
                   </select>
@@ -246,13 +271,15 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
 
               <!-- Tipo de Residência -->
               <div class="proposal-field">
-                <label for="et-tipo-res">Tipo de Residência</label>
+                <label for="et-tipo-res">{{ tipoLabel }}</label>
                 <div class="dp-select-wrap">
-                  <select id="et-tipo-res" v-model="tipoResidencia"
+                  <select
+id="et-tipo-res" v-model="tipoResidencia"
                     :class="['proposal-select', errors.tipoResidencia && touched.tipoResidencia ? 'is-error' : '']"
-                    @blur="validate('tipoResidencia')">
+                    @blur="validate('tipoResidencia')"
+>
                     <option value="" disabled>Selecione</option>
-                    <option v-for="tipo in tiposResidencia" :key="tipo" :value="tipo">{{ tipo }}</option>
+                    <option v-for="tipo in tiposLocal" :key="tipo" :value="tipo">{{ tipo }}</option>
                   </select>
                   <svg class="dp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </div>
@@ -275,15 +302,19 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
                 <label>Celular</label>
                 <div class="et-phone-wrap">
                   <div class="et-ddd-wrap">
-                    <input :value="celularDDD" type="text" inputmode="numeric" placeholder="(00)" maxlength="2"
+                    <input
+:value="celularDDD" type="text" inputmode="numeric" placeholder="(00)" maxlength="2"
                       aria-label="DDD do celular"
                       :class="['et-ddd', errors.celularDDD && touched.celularDDD ? 'is-error' : '']"
-                      @input="onDDDInput('celularDDD', $event)" @blur="validate('celularDDD')" />
+                      @input="onDDDInput('celularDDD', $event)" @blur="validate('celularDDD')"
+/>
                   </div>
-                  <input :value="celularNum" type="text" inputmode="numeric" placeholder="00000-0000" maxlength="10"
+                  <input
+:value="celularNum" type="text" inputmode="numeric" placeholder="00000-0000" maxlength="10"
                     aria-label="Número do celular"
                     :class="['proposal-input et-phone-num', errors.celularNum && touched.celularNum ? 'is-error' : '']"
-                    @input="onPhoneInput('celularNum', $event)" @blur="validate('celularNum')" />
+                    @input="onPhoneInput('celularNum', $event)" @blur="validate('celularNum')"
+/>
                 </div>
                 <p v-if="(errors.celularDDD && touched.celularDDD) || (errors.celularNum && touched.celularNum)" class="field-error" role="alert">
                   {{ errors.celularDDD || errors.celularNum }}
@@ -294,9 +325,11 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
               <div class="proposal-field">
                 <label for="et-canal">Canal de Contato Preferido</label>
                 <div class="dp-select-wrap">
-                  <select id="et-canal" v-model="canalContato"
+                  <select
+id="et-canal" v-model="canalContato"
                     :class="['proposal-select', errors.canalContato && touched.canalContato ? 'is-error' : '']"
-                    @blur="validate('canalContato')">
+                    @blur="validate('canalContato')"
+>
                     <option value="" disabled>Selecione</option>
                     <option v-for="c in canaisContato" :key="c" :value="c">{{ c }}</option>
                   </select>
@@ -309,9 +342,11 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
               <div class="proposal-field">
                 <label for="et-horario">Horário Preferido</label>
                 <div class="dp-select-wrap">
-                  <select id="et-horario" v-model="horario"
+                  <select
+id="et-horario" v-model="horario"
                     :class="['proposal-select', errors.horario && touched.horario ? 'is-error' : '']"
-                    @blur="validate('horario')">
+                    @blur="validate('horario')"
+>
                     <option value="" disabled>Selecione</option>
                     <option v-for="h in horariosContato" :key="h" :value="h">{{ h }}</option>
                   </select>
@@ -320,18 +355,22 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
                 <p v-if="errors.horario && touched.horario" class="field-error" role="alert">{{ errors.horario }}</p>
               </div>
 
-              <!-- Telefone Residencial (opcional) — última posição -->
+              <!-- Telefone Empresarial (opcional) — última posição -->
               <div class="proposal-field et-full-width">
-                <label>Telefone Residencial <span class="et-optional">(opcional)</span></label>
+                <label>Telefone Empresarial <span class="et-optional">(opcional)</span></label>
                 <div class="et-phone-wrap">
                   <div class="et-ddd-wrap">
-                    <input :value="residencialDDD" type="text" inputmode="numeric" placeholder="(00)" maxlength="2"
-                      aria-label="DDD do telefone residencial" class="et-ddd"
-                      @input="onDDDInput('residencialDDD', $event)" />
+                    <input
+:value="residencialDDD" type="text" inputmode="numeric" placeholder="(00)" maxlength="2"
+                      aria-label="DDD do Telefone Empresarial" class="et-ddd"
+                      @input="onDDDInput('residencialDDD', $event)"
+/>
                   </div>
-                  <input :value="residencialNum" type="text" inputmode="numeric" placeholder="0000-0000" maxlength="9"
-                    aria-label="Número do telefone residencial" class="proposal-input et-phone-num"
-                    @input="onPhoneInput('residencialNum', $event)" />
+                  <input
+:value="residencialNum" type="text" inputmode="numeric" placeholder="0000-0000" maxlength="9"
+                    aria-label="Número do Telefone Empresarial" class="proposal-input et-phone-num"
+                    @input="onPhoneInput('residencialNum', $event)"
+/>
                 </div>
               </div>
             </div>
@@ -359,6 +398,7 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
 .proposal-header { position: sticky; top: 0; z-index: 10; background: var(--color-gray-50); border-bottom: 1px solid var(--color-primary-100); }
 .proposal-header__inner { max-width: 1024px; margin: 0 auto; padding: 0 20px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
 .proposal-header__logo { height: 24px; width: auto; }
+.is-pj .proposal-header__logo { height: 44px; }
 .proposal-header__back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--color-primary-100); border-radius: 999px; background: transparent; color: var(--color-navy-800); font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
 .proposal-header__back:hover { background: var(--color-primary-50); }
 
@@ -410,7 +450,7 @@ const horariosContato = ['08h às 12h', '12h às 18h', '18h às 21h']
 .et-cep-link { color: var(--color-primary-500); text-decoration: underline; }
 
 /* ── Alert ── */
-.et-alert { display: flex; align-items: flex-start; gap: 8px; background: #fffbeb; border: 1px solid #f9e08a; border-radius: 12px; padding: 12px 14px; font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: #92610a; margin-bottom: 20px; line-height: 1.5; }
+.et-alert { display: flex; align-items: flex-start; gap: 8px; background: #fffbeb; border: 1px solid var(--color-warning-200); border-radius: 12px; padding: 12px 14px; font-family: 'Instrument Sans', sans-serif; font-size: 16px; color: var(--color-warning-text); margin-bottom: 20px; line-height: 1.5; }
 
 /* ── Phone inputs ── */
 .et-phone-wrap { display: flex; align-items: center; gap: 8px; }

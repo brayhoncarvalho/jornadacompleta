@@ -9,9 +9,9 @@
         </p>
       </div>
 
-      <div class="como-funciona__grid" role="list" aria-label="Etapas da contratação">
+      <ul class="como-funciona__grid" aria-label="Etapas da contratação">
 
-        <article class="como-funciona__step" role="listitem">
+        <li class="como-funciona__step">
           <div class="como-funciona__circle" aria-hidden="true">1</div>
           <div class="como-funciona__step-body">
             <p class="como-funciona__step-title">Preencha a proposta</p>
@@ -19,9 +19,9 @@
               Contrate seu empréstimo 100% online. Fácil, rápido e seguro.
             </p>
           </div>
-        </article>
+        </li>
 
-        <article class="como-funciona__step" role="listitem">
+        <li class="como-funciona__step">
           <div class="como-funciona__circle" aria-hidden="true">2</div>
           <div class="como-funciona__step-body">
             <p class="como-funciona__step-title">Aguarde a aprovação</p>
@@ -29,9 +29,9 @@
               Após a análise rápida feita pelos consultores.
             </p>
           </div>
-        </article>
+        </li>
 
-        <article class="como-funciona__step" role="listitem">
+        <li class="como-funciona__step">
           <div class="como-funciona__circle" aria-hidden="true">3</div>
           <div class="como-funciona__step-body">
             <p class="como-funciona__step-title">Receba o seu dinheiro!</p>
@@ -39,9 +39,9 @@
               Leia os termos, assine o contrato e receba o seu dinheiro.
             </p>
           </div>
-        </article>
+        </li>
 
-      </div>
+      </ul>
     </div>
   </section>
 </template>
@@ -84,6 +84,9 @@
 .como-funciona__grid {
   display: flex;
   flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
   border-bottom: 1px solid var(--color-primary-100);
 }
 

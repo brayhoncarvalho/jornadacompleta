@@ -28,6 +28,8 @@
     "@lucide/vue": "^1.23.0",
     "@tabler/icons-vue": "^3.44.0",
     "date-fns": "^4.1.0",
+    "lucide-vue-next": "^0.542.0",
+    "shared-design-system-vue-lib": "^1.0.4",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.2"
   },
